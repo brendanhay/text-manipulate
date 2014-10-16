@@ -71,19 +71,19 @@ transform :: (Char -> Bool) -- ^ Boundary predicate
           -> Stream Char
           -> Stream Char
 transform f g !x (Stream next0 s0 len) =
-    Stream next (step s0 True False) len
+    Stream next (CC (True :*: False :*: False :*: s0) '\0' '\0') len
   where
-    next (CC (upper :*: bdry :*: s) '\0' _) =
+    next (CC (start :*: upper :*: bdry :*: s) '\0' _) =
         case next0 s of
-            Done               -> Done
-            Skip s'            -> Skip        (step s' upper bdry)
+            Done                   -> Done
+            Skip s'                -> Skip        (step s' upper bdry)
             Yield c s'
-                | bdry, b      -> Skip        (step s' u b)
-                | upper, u     -> Yield (g c) (step s' u True)
-                | not upper, u -> Yield x     (push s' u b (g c))
-                | b            -> Yield x     (step s' u b)
-                | upper        -> Yield (g c) (step s' u b)
-                | otherwise    -> Yield c     (step s' u b)
+                | b, bdry || start -> Skip        (step s' u b)
+                | b                -> Yield x     (step s' u b)
+                | u, bdry || start -> Yield (g c) (step s' u b)
+                | u, upper         -> Yield (g c) (step s' u b)
+                | u                -> Yield x     (push s' u b (g c))
+                | otherwise        -> Yield c     (step s' u b)
               where
                 b = f c
                 u = Char.isUpper c
@@ -91,7 +91,7 @@ transform f g !x (Stream next0 s0 len) =
     next (CC s a b) = Yield a (CC s b '\0')
 
     step s upper bdry   = push s upper bdry '\0'
-    push s upper bdry c = CC (upper :*: bdry :*: s) c '\0'
+    push s upper bdry c = CC (False :*: upper :*: bdry :*: s) c '\0'
 {-# INLINE transform #-}
 
 boundary :: Char -> Bool
