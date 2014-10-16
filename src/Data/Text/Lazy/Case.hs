@@ -10,9 +10,10 @@
 
 module Data.Text.Lazy.Case where
 
-import           Data.Text                 (Text)
-import qualified Data.Text.Case.Fusion     as Fusion
-import           Data.Text.Internal.Fusion (Stream, stream, unstream)
+import qualified Data.Text.Case.Fusion          as Fusion
+import           Data.Text.Internal.Fusion      (Stream)
+import           Data.Text.Internal.Lazy.Fusion (stream, unstream)
+import           Data.Text.Lazy                 (Text)
 
 lowerFirst :: Text -> Text
 lowerFirst = lazy Fusion.lowerFirst
@@ -34,6 +35,9 @@ toSpinal = lazy Fusion.toSpinal
 
 toTrain :: Text -> Text
 toTrain = lazy Fusion.toTrain
+
+toHuman :: Text -> Text
+toHuman = lazy Fusion.toHuman
 
 lazy :: (Stream Char -> Stream Char) -> Text -> Text
 lazy f = unstream . f . stream

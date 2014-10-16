@@ -39,8 +39,8 @@ toSpinal = transform boundary Char.toLower '-'
 toTrain :: Stream Char -> Stream Char
 toTrain = transform boundary Char.toUpper '-'
 
--- toHuman :: Stream Char -> Stream Char
--- toHuman = upperHead . split id ' '
+toHuman :: Stream Char -> Stream Char
+toHuman = upperFirst . transform boundary id ' '
 
 -- | Remove word boundaries and uppercase any subsequent valid characters.
 normalise :: (Char -> Bool) -- ^ Boundary predicate

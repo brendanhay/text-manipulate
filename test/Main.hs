@@ -12,12 +12,10 @@
 
 module Main (main) where
 
-import           Data.Monoid
-import           Data.Text        (Text)
-import qualified Data.Text        as Text
-import           Data.Text.Case
-import           Test.Tasty
-import           Test.Tasty.HUnit
+import Data.Text        (Text)
+import Data.Text.Case
+import Test.Tasty
+import Test.Tasty.HUnit
 
 main :: IO ()
 main = defaultMain $ testGroup "tests"

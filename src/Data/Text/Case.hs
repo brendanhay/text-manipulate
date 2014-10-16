@@ -14,16 +14,12 @@ import           Data.Text                 (Text)
 import qualified Data.Text.Case.Fusion     as Fusion
 import           Data.Text.Internal.Fusion (Stream, stream, unstream)
 
-   -- , toLower
-   --  , toTitle
-   --  , toUpper
-
+-- toLower
+-- toTitle
+-- toUpper
 -- firstWord
-
 -- firstAcronym
-
 -- toOrdinal
-
 -- indent
 
 lowerFirst :: Text -> Text
@@ -47,62 +43,9 @@ toSpinal = strict Fusion.toSpinal
 toTrain :: Text -> Text
 toTrain = strict Fusion.toTrain
 
--- toHuman :: Text -> Text
--- toHuman = strict Fusion.toHuman
-
--- toEscaped
-
---     :: [Word]
--- List of Words, first of which will be capitalized
---                             -> String
--- The humanized output
--- Capitalizes the first word and turns underscores into spaces
---  Like titleize, this is meant for creating pretty output.
-
--- ]
-
--- lowerHead :: Text -> Text
--- lowerHead = strict (first toLower)
-
--- upperHead :: Text -> Text
--- upperHead = strict (first toUpper)
-
--- toCamel :: Text -> Text
--- toCamel = strict (first toLower . recase)
-
--- toPascal :: Text -> Text
--- toPascal = strict (first toUpper . recase)
-
--- toSnake :: Text -> Text
--- toSnake = strict (split (Char.toLower) '_')
+toHuman :: Text -> Text
+toHuman = strict Fusion.toHuman
 
 strict :: (Stream Char -> Stream Char) -> Text -> Text
 strict f = unstream . f . stream
 {-# INLINE strict #-}
-
--- -- some_words
--- toSnake
--- -- SOME_WORDS
--- toScreamingSnake
-
--- toSpinal
--- -- Train-Case
--- toTrain
-
--- lowered :: String -> String
--- lowered = map toLower
-
--- camelise :: [String] -> String
--- camelise (x : xs) = concat (x : map (\(y : ys) -> toUpper y : lowered ys) xs)
--- camelise []       = []
-
--- cased :: Char -> [String] -> String
--- cased x xs = concat $ intersperse [x] (map lowered xs)
-
--- uncased :: Char -> String -> [String]
--- uncased x xs = y ++ map tail ys
---   where
---   (y, ys) = splitAt 1 (splitBy (== x) xs)
-
--- splitBy :: (a -> Bool) -> [a] -> [[a]]
--- splitBy p = groupBy (const (not . p))
