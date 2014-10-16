@@ -17,10 +17,15 @@ import qualified Data.Text.Case.Fusion as Fusion
 -- toLower
 -- toTitle
 -- toUpper
--- firstWord
--- firstAcronym
+-- takeWord
+-- takeAcronym
 -- toOrdinal
 -- indent
+
+add some unicode tests
+
+maybe have an acronym table like inflector?
+affects the streaming .. perhaps applied as after-effect, opt-in
 
 lowerFirst :: Text -> Text
 lowerFirst = strict Fusion.lowerFirst

@@ -61,14 +61,14 @@ normalise :: (Char -> Bool) -- ^ Boundary predicate
 normalise f (Stream next0 s0 len) =
     Stream next (CC (False :*: s0) '\0' '\0') len
   where
-    next (CC (bdry :*: s) '\0' _) =
+    next (CC (bnd :*: s) '\0' _) =
         case next0 s of
             Done            -> Done
-            Skip s'         -> Skip    (CC (bdry :*: s') '\0' '\0')
+            Skip s'         -> Skip    (CC (bnd :*: s') '\0' '\0')
             Yield c s'
-                | bdry      -> upperMapping c (b :*: s')
-                | b         -> Skip    (CC (b    :*: s') '\0' '\0')
-                | otherwise -> Yield c (CC (b    :*: s') '\0' '\0')
+                | bnd      -> upperMapping c (b :*: s')
+                | b         -> Skip    (CC (b   :*: s') '\0' '\0')
+                | otherwise -> Yield c (CC (b   :*: s') '\0' '\0')
               where
                 b = f c
 
@@ -85,27 +85,27 @@ transform :: (Char -> Bool) -- ^ Boundary predicate
 transform f g !x (Stream next0 s0 len) =
     Stream next (CC (True :*: False :*: False :*: s0) '\0' '\0') len
   where
-    next (CC (start :*: upper :*: bdry :*: s) '\0' _) =
+    next (CC (start :*: upper :*: bnd :*: s) '\0' _) =
         case next0 s of
-            Done                   -> Done
-            Skip s'                -> Skip        (step s' upper bdry)
+            Done                  -> Done
+            Skip s'               -> Skip        (step s' upper bnd)
             Yield c s'
-                | start            -> Yield (g c) (step s' u b)
-                | b, bdry          -> Skip        (step s' u b)
-                | bdry             -> Yield (g c) (step s' u b)
-                | b                -> Yield x     (step s' u b)
-                | u, bdry || start -> Yield (g c) (step s' u b)
-                | u, upper         -> Yield (g c) (step s' u b)
-                | u                -> Yield x     (push s' u b (g c))
-                | otherwise        -> Yield c     (step s' u b)
+                | start           -> Yield (g c) (step s' u b)
+                | b, bnd          -> Skip        (step s' u b)
+                | bnd             -> Yield (g c) (step s' u b)
+                | b               -> Yield x     (step s' u b)
+                | u, bnd || start -> Yield (g c) (step s' u b)
+                | u, upper        -> Yield (g c) (step s' u b)
+                | u               -> Yield x     (push s' u b (g c))
+                | otherwise       -> Yield c     (step s' u b)
               where
                 b = f c
                 u = Char.isUpper c
 
     next (CC s a b) = Yield a (CC s b '\0')
 
-    step s upper bdry   = push s upper bdry '\0'
-    push s upper bdry c = CC (False :*: upper :*: bdry :*: s) c '\0'
+    step s upper bnd   = push s upper bnd '\0'
+    push s upper bnd c = CC (False :*: upper :*: bnd :*: s) c '\0'
 {-# INLINE transform #-}
 
 boundary :: Char -> Bool
