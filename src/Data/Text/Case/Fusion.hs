@@ -78,7 +78,9 @@ transform f g !x (Stream next0 s0 len) =
             Done                   -> Done
             Skip s'                -> Skip        (step s' upper bdry)
             Yield c s'
-                | b, bdry || start -> Skip        (step s' u b)
+                | start            -> Yield (g c) (step s' u b)
+                | b, bdry          -> Skip        (step s' u b)
+                | bdry             -> Yield (g c) (step s' u b)
                 | b                -> Yield x     (step s' u b)
                 | u, bdry || start -> Yield (g c) (step s' u b)
                 | u, upper         -> Yield (g c) (step s' u b)
