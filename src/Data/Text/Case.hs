@@ -35,8 +35,8 @@ toSpinal = strict Fusion.toSpinal
 toTrain :: Text -> Text
 toTrain = strict Fusion.toTrain
 
-toHuman :: Text -> Text
-toHuman = strict Fusion.toHuman
+-- toHuman :: Text -> Text
+-- toHuman = strict Fusion.toHuman
 
 --     :: [Word]
 -- List of Words, first of which will be capitalized

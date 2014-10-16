@@ -21,7 +21,7 @@ module Data.Text.Case.Fusion
     , toSnake
     , toSpinal
     , toTrain
-    , toHuman
+    -- , toHuman
 
     , recase
     , split
@@ -31,6 +31,7 @@ import qualified Data.Char                             as Char
 import           Data.Text.Internal.Fusion.CaseMapping
 import           Data.Text.Internal.Fusion.Common
 import           Data.Text.Internal.Fusion.Types
+import           Debug.Trace
 
 lowerHead :: Stream Char -> Stream Char
 lowerHead = first toLower
@@ -53,46 +54,51 @@ toSpinal = split Char.toLower '-'
 toTrain :: Stream Char -> Stream Char
 toTrain = split Char.toUpper '-'
 
-toHuman :: Stream Char -> Stream Char
-toHuman = upperHead . split id ' '
+-- toHuman :: Stream Char -> Stream Char
+-- toHuman = upperHead . split id ' '
 
 recase :: Stream Char -> Stream Char
 recase (Stream next0 s0 len) =
     Stream next (CC (False :*: s0) '\0' '\0') len
   where
-    next (CC (p :*: s) '\0' _) = case next0 s of
-        Done            -> Done
-        Skip s'         -> Skip (CC (p :*: s') '\0' '\0')
-        Yield c s'
-            | p         -> upperMapping c (b :*: s')
-            | b         -> Skip (CC (b :*: s') '\0' '\0')
-            | otherwise -> Yield c (CC (p :*: s') '\0' '\0')
-          where
-            b = boundary c
+    next (CC (p :*: s) '\0' _) =
+        case next0 s of
+            Done            -> Done
+            Skip s'         -> Skip (CC (p :*: s') '\0' '\0')
+            Yield c s'
+                | p         -> upperMapping c (b :*: s')
+                | b         -> Skip (CC (b :*: s') '\0' '\0')
+                | otherwise -> Yield c (CC (p :*: s') '\0' '\0')
+              where
+                b = boundary c
 
     next (CC s a b) = Yield a (CC s b '\0')
 {-# INLINE recase #-}
 
-split :: (Char -> Char) -> Char -> Stream Char -> Stream Char
+split :: (Char -> Char) -- ^ Char transformer
+      -> Char           -- ^ Delimiter
+      -> Stream Char -> Stream Char
 split f !x (Stream next0 s0 len) =
     Stream next (CC (True :*: False :*: s0) '\0' '\0') len
   where
-    next (CC (d :*: p :*: s) '\0' _) = case next0 s of
-        Done                        -> Done
-        Skip s'                     -> Skip (step s' p '\0')
-        Yield c s'
-            | d                     -> Yield (f c) (step s' False '\0')
-            | p && b                -> Yield c (step s' b '\0')
-            | p                     -> lowerMapping c (False :*: b :*: s')
-            | b                     -> Yield x (step s' b '\0')
-            | not d, Char.isUpper c -> Yield x (step s' b (f c)) -- FIXME: use lowerMapping
-            | otherwise             -> Yield c (step s' b '\0')
-          where
-            b = boundary c
+    next (CC (d :*: p :*: s) '\0' _) =
+        case next0 s of
+            Done                    -> Done
+            Skip s'                 -> Skip (step s' p '\0')
+            Yield c s'
+                | d                 -> Yield (f c) (step s' False '\0')
+                | p, Char.isUpper c -> Yield (f c) (step s' b '\0')
+                | Char.isUpper c    -> Yield x (step s' b (f c))
+                | p, b              -> Skip (step s' b '\0')
+                | b                 -> Yield x (step s' b '\0')
+                | otherwise         -> Yield c (step s' b '\0')
+              where
+                b = boundary c
 
     next (CC s a b) = Yield a (CC s b '\0')
 
     step s bdry c = CC (False :*: bdry :*: s) c '\0'
+
 {-# INLINE split #-}
 
 boundary :: Char -> Bool
