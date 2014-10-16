@@ -57,7 +57,7 @@ main = defaultMain $ testGroup "tests"
         , "trainCasedPhrase"
         , "1MixedStringAOK"
         , "aDoubleStopPhrase"
-        , "HTML5"
+        , "hTML5"
         ]
 
     , test "toPascal" toPascal
