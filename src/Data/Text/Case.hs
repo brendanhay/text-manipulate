@@ -10,9 +10,9 @@
 
 module Data.Text.Case where
 
-import           Data.Text                 (Text)
-import qualified Data.Text.Case.Fusion     as Fusion
-import           Data.Text.Internal.Fusion (Stream, stream, unstream)
+import           Data.Text             (Text)
+import           Data.Text.Case.Fusion (strict)
+import qualified Data.Text.Case.Fusion as Fusion
 
 -- toLower
 -- toTitle
@@ -45,7 +45,3 @@ toTrain = strict Fusion.toTrain
 
 toHuman :: Text -> Text
 toHuman = strict Fusion.toHuman
-
-strict :: (Stream Char -> Stream Char) -> Text -> Text
-strict f = unstream . f . stream
-{-# INLINE strict #-}

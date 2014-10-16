@@ -109,6 +109,19 @@ main = defaultMain $ testGroup "tests"
         , "A-Double-Stop-Phrase"
         , "HTML5"
         ]
+
+    , test "toHuman" toHuman
+        [ ""
+        , "Title cased phrase"
+        , "Camel cased phrase"
+        , "Pascal cased phrase"
+        , "Snake cased phrase"
+        , "Spinal cased phrase"
+        , "Train cased phrase"
+        , "1 mixed string AOK"
+        , "A double stop phrase"
+        , "HTML5"
+        ]
     ]
 
 examples :: [(String, Text)]

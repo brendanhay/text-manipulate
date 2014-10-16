@@ -14,9 +14,13 @@
 module Data.Text.Case.Fusion where
 
 import qualified Data.Char                             as Char
-import           Data.Text.Internal.Fusion.CaseMapping
+import           Data.Text                             (Text)
+import qualified Data.Text.Internal.Fusion             as Fusion
+import           Data.Text.Internal.Fusion.CaseMapping (upperMapping)
 import           Data.Text.Internal.Fusion.Common
 import           Data.Text.Internal.Fusion.Types
+import qualified Data.Text.Internal.Lazy.Fusion        as LFusion
+import qualified Data.Text.Lazy                        as LText
 
 lowerFirst :: Stream Char -> Stream Char
 lowerFirst = first toLower
@@ -40,7 +44,15 @@ toTrain :: Stream Char -> Stream Char
 toTrain = transform boundary Char.toUpper '-'
 
 toHuman :: Stream Char -> Stream Char
-toHuman = upperFirst . transform boundary id ' '
+toHuman = upperFirst . transform boundary Char.toLower ' '
+
+strict :: (Stream Char -> Stream Char) -> Text -> Text
+strict f = Fusion.unstream . f . Fusion.stream
+{-# INLINE strict #-}
+
+lazy :: (Stream Char -> Stream Char) -> LText.Text -> LText.Text
+lazy f = LFusion.unstream . f . LFusion.stream
+{-# INLINE lazy #-}
 
 -- | Remove word boundaries and uppercase any subsequent valid characters.
 normalise :: (Char -> Bool) -- ^ Boundary predicate
