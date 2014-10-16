@@ -113,25 +113,22 @@ main = defaultMain $ testGroup "tests"
         ]
     ]
 
-examples :: [Text]
+examples :: [(String, Text)]
 examples =
-    [ ""
-    , "Title cased phrase"
-    , "camelCasedPhrase"
-    , "PascalCasedPhrase"
-    , "snake_cased_phrase"
-    , "spinal-cased-phrase"
-    , "Train-Cased-Phrase"
-    , "1-Mixed_string AOK"
-    , "a  double--stop__phrase"
-    , "HTML5"
+    [ ("Empty",       "")
+    , ("Title",       "Title cased phrase")
+    , ("Camel",       "camelCasedPhrase")
+    , ("Pascal",      "PascalCasedPhrase")
+    , ("Snake",       "snake_cased_phrase")
+    , ("Spinal",      "spinal-cased-phrase")
+    , ("Train",       "Train-Cased-Phrase")
+    , ("Mixed",       "1-Mixed_string AOK")
+    , ("Double Stop", "a  double--stop__phrase")
+    , ("Acronym",     "HTML5")
     ]
 
 test :: TestName -> (Text -> Text) -> [Text] -> TestTree
 test n f = testGroup n . zipWith (run f) examples
 
-run :: (Text -> Text) -> Text -> Text -> TestTree
-run f x y = testCase n (y @=? f x)
-  where
-    n | Text.null x = "Empty String"
-      | otherwise   = Text.unpack (x <> " -> " <> y)
+run :: (Text -> Text) -> (String, Text) -> Text -> TestTree
+run f (n, x) y = testCase n (y @=? f x)
