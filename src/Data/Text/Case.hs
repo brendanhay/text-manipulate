@@ -14,11 +14,23 @@ import           Data.Text                 (Text)
 import qualified Data.Text.Case.Fusion     as Fusion
 import           Data.Text.Internal.Fusion (Stream, stream, unstream)
 
-lowerHead :: Text -> Text
-lowerHead = strict Fusion.lowerHead
+   -- , toLower
+   --  , toTitle
+   --  , toUpper
 
-upperHead :: Text -> Text
-upperHead = strict Fusion.upperHead
+-- firstWord
+
+-- firstAcronym
+
+-- toOrdinal
+
+-- indent
+
+lowerFirst :: Text -> Text
+lowerFirst = strict Fusion.lowerFirst
+
+upperFirst :: Text -> Text
+upperFirst = strict Fusion.upperFirst
 
 toCamel :: Text -> Text
 toCamel = strict Fusion.toCamel
@@ -37,6 +49,8 @@ toTrain = strict Fusion.toTrain
 
 -- toHuman :: Text -> Text
 -- toHuman = strict Fusion.toHuman
+
+-- toEscaped
 
 --     :: [Word]
 -- List of Words, first of which will be capitalized

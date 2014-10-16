@@ -26,10 +26,10 @@ library
 
     exposed-modules:
           Data.Text.Case
-        , Data.Text.Case.Fusion
+        , Data.Text.Lazy.Case
 
-          -- Data.Text.Lazy.Case
-          -- Data.Text.Case.Fusion.Mapping
+    other-modules:
+          Data.Text.Case.Fusion
 
     build-depends:
           base >= 4.5 && < 5.0
