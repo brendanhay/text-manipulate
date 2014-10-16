@@ -21,6 +21,7 @@ module Data.Text.Case.Fusion
     , toSnake
     , toSpinal
     , toTrain
+    , toHuman
 
     , recase
     , split
@@ -52,6 +53,9 @@ toSpinal = split Char.toLower '-'
 toTrain :: Stream Char -> Stream Char
 toTrain = split Char.toUpper '-'
 
+toHuman :: Stream Char -> Stream Char
+toHuman = upperHead . split id ' '
+
 recase :: Stream Char -> Stream Char
 recase (Stream next0 s0 len) =
     Stream next (CC (False :*: s0) '\0' '\0') len
@@ -68,8 +72,6 @@ recase (Stream next0 s0 len) =
 
     next (CC s a b) = Yield a (CC s b '\0')
 {-# INLINE recase #-}
-
--- Not dealing with nested contiguous caps blocks properly, like: "This is AOK"
 
 split :: (Char -> Char) -> Char -> Stream Char -> Stream Char
 split f !x (Stream next0 s0 len) =

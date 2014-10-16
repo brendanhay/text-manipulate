@@ -10,18 +10,33 @@
 
 module Data.Text.Case where
 
-import qualified Data.Char                        as Char
+import           Data.Text                 (Text)
+import qualified Data.Text.Case.Fusion     as Fusion
+import           Data.Text.Internal.Fusion (Stream, stream, unstream)
 
-import Data.Text                        (Text)
-import Data.Text.Case.Fusion
-import Data.Text.Internal.Fusion
-import Data.Text.Internal.Fusion.Common
+lowerHead :: Text -> Text
+lowerHead = strict Fusion.lowerHead
 
--- toOrdinal
+upperHead :: Text -> Text
+upperHead = strict Fusion.upperHead
 
--- toHuman :: 
-toHuman = strict (upperHead . split id ' ')
+toCamel :: Text -> Text
+toCamel = strict Fusion.toCamel
 
+toPascal :: Text -> Text
+toPascal = strict Fusion.toPascal
+
+toSnake :: Text -> Text
+toSnake = strict Fusion.toSnake
+
+toSpinal :: Text -> Text
+toSpinal = strict Fusion.toSpinal
+
+toTrain :: Text -> Text
+toTrain = strict Fusion.toTrain
+
+toHuman :: Text -> Text
+toHuman = strict Fusion.toHuman
 
 --     :: [Word]
 -- List of Words, first of which will be capitalized

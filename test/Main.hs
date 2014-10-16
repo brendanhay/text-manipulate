@@ -12,16 +12,49 @@
 
 module Main (main) where
 
-import Control.Applicative
-import Data.List           (sort)
-import Data.Text           (Text, unpack)
+import Data.Text        (Text, unpack)
 import Data.Text.Case
 import Test.Tasty
 import Test.Tasty.HUnit
 
 main :: IO ()
 main = defaultMain $ testGroup "tests"
-    [ test "toHuman" toHuman
+    [ test "lowerHead" lowerHead
+        [ "SCREAMING_SNAKE" @: "sCREAMING_SNAKE"
+        , "quiet snake."    @: "Quiet snake."
+        ]
+
+    , test "upperHead" upperHead
+        [ "lorem Ipsum"  @: "Lorem Ipsum"
+        , "Big kahoonas" @: "Big khaoonas"
+        ]
+
+    , test "toCamel" toCamel
+        [ "PascalCased" @: "pascalCased"
+        , "snake_cased_var" @: "snakeCasedVar"
+        ]
+
+    , test "toPascal" toPascal
+        [
+        ]
+
+    , test "toSnake" toSnake
+        [
+        ]
+
+    , test "toSpinal" toSpinal
+        [
+        ]
+
+    , test "toTrain" toTrain
+        [
+        ]
+
+    , test "toHuman" toHuman
+        [
+        ]
+
+    , test "toHuman" toHuman
         [ "This is AOK"              @: "This is AOK"
         , "A-Slightly_Longer String" @: "A slightly longer string"
         ]
