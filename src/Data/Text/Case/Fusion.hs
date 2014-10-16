@@ -17,7 +17,6 @@ import qualified Data.Char                             as Char
 import           Data.Text.Internal.Fusion.CaseMapping
 import           Data.Text.Internal.Fusion.Common
 import           Data.Text.Internal.Fusion.Types
-import           Debug.Trace
 
 lowerFirst :: Stream Char -> Stream Char
 lowerFirst = first toLower
