@@ -1,5 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE RankNTypes   #-}
 
 -- Module      : Data.Text.Case.Fusion
 -- Copyright   : (c) 2014 Brendan Hay <brendan.g.hay@gmail.com>
@@ -16,7 +17,7 @@ module Data.Text.Case.Fusion where
 import qualified Data.Char                             as Char
 import           Data.Text                             (Text)
 import qualified Data.Text.Internal.Fusion             as Fusion
-import           Data.Text.Internal.Fusion.CaseMapping (upperMapping)
+import           Data.Text.Internal.Fusion.CaseMapping (upperMapping, lowerMapping, titleMapping)
 import           Data.Text.Internal.Fusion.Common
 import           Data.Text.Internal.Fusion.Types
 import qualified Data.Text.Internal.Lazy.Fusion        as LFusion
@@ -24,34 +25,42 @@ import qualified Data.Text.Lazy                        as LText
 
 lowerFirst :: Stream Char -> Stream Char
 lowerFirst = first toLower
+{-# INLINE lowerFirst #-}
 
 upperFirst :: Stream Char -> Stream Char
 upperFirst = first toUpper
+{-# INLINE upperFirst #-}
 
 toCamel :: Stream Char -> Stream Char
-toCamel = lowerFirst . normalise boundary
+toCamel = lowerFirst . normalise isBoundary
+{-# INLINE toCamel #-}
 
 toPascal :: Stream Char -> Stream Char
-toPascal = upperFirst . normalise boundary
+toPascal = upperFirst . normalise isBoundary
+{-# INLINE toPascal #-}
 
 toSnake :: Stream Char -> Stream Char
-toSnake = transform boundary Char.toLower '_'
+toSnake = transform isBoundary lowerMapping '_'
+{-# INLINE toSnake #-}
 
 toSpinal :: Stream Char -> Stream Char
-toSpinal = transform boundary Char.toLower '-'
+toSpinal = transform isBoundary lowerMapping '-'
+{-# INLINE toSpinal #-}
 
 toTrain :: Stream Char -> Stream Char
-toTrain = transform boundary Char.toUpper '-'
+toTrain = transform isBoundary titleMapping '-'
+{-# INLINE toTrain #-}
 
 toHuman :: Stream Char -> Stream Char
-toHuman = upperFirst . transform boundary Char.toLower ' '
+toHuman = upperFirst . transform isBoundary lowerMapping ' '
+{-# INLINE toHuman #-}
 
 strict :: (Stream Char -> Stream Char) -> Text -> Text
-strict f = Fusion.unstream . f . Fusion.stream
+strict f t = Fusion.unstream (f (Fusion.stream t))
 {-# INLINE strict #-}
 
 lazy :: (Stream Char -> Stream Char) -> LText.Text -> LText.Text
-lazy f = LFusion.unstream . f . LFusion.stream
+lazy f t = LFusion.unstream (f (LFusion.stream t))
 {-# INLINE lazy #-}
 
 -- | Remove word boundaries and uppercase any subsequent valid characters.
@@ -66,7 +75,7 @@ normalise f (Stream next0 s0 len) =
             Done            -> Done
             Skip s'         -> Skip    (CC (bnd :*: s') '\0' '\0')
             Yield c s'
-                | bnd      -> upperMapping c (b :*: s')
+                | bnd       -> upperMapping c (b :*: s')
                 | b         -> Skip    (CC (b   :*: s') '\0' '\0')
                 | otherwise -> Yield c (CC (b   :*: s') '\0' '\0')
               where
@@ -75,42 +84,52 @@ normalise f (Stream next0 s0 len) =
     next (CC s a b) = Yield a (CC s b '\0')
 {-# INLINE normalise #-}
 
+-- | This is simply a replica of 'CC' from 'Data.Text.Internal.Fusion.Types'
+-- which has an extra slot for the delimiter.
+data T s = T !s {-# UNPACK #-} !Char {-# UNPACK #-} !Char {-# UNPACK #-} !Char
+
 -- | Replace word boundaries with a specific delimiter, and transform
--- any subsequent valid characters after boundary is encountered.
-transform :: (Char -> Bool) -- ^ Boundary predicate
-          -> (Char -> Char) -- ^ Char transformer
-          -> Char           -- ^ Delimiter
+-- any subsequent valid characters after the word boundary is encountered.
+transform :: (Char -> Bool)                            -- ^ Boundary predicate
+          -> (forall s. Char -> s -> Step (CC s) Char) -- ^ Char mapping
+          -> Char                                      -- ^ Delimiter
           -> Stream Char
           -> Stream Char
-transform f g !x (Stream next0 s0 len) =
-    Stream next (CC (True :*: False :*: False :*: s0) '\0' '\0') len
+transform f m !d (Stream next0 s0 len) =
+    Stream next (T (s0 :*: True :*: False :*: False) '\0' '\0' '\0') len
   where
-    next (CC (start :*: upper :*: bnd :*: s) '\0' _) =
+    next (T (s :*: start :*: upper :*: bdry) '\0' '\0' _) =
         case next0 s of
-            Done                  -> Done
-            Skip s'               -> Skip        (step s' upper bnd)
+            Done                   -> Done
+            Skip s'                -> Skip (step s' upper bdry)
             Yield c s'
-                | start           -> Yield (g c) (step s' u b)
-                | b, bnd          -> Skip        (step s' u b)
-                | bnd             -> Yield (g c) (step s' u b)
-                | b               -> Yield x     (step s' u b)
-                | u, bnd || start -> Yield (g c) (step s' u b)
-                | u, upper        -> Yield (g c) (step s' u b)
-                | u               -> Yield x     (push s' u b (g c))
-                | otherwise       -> Yield c     (step s' u b)
+                | start            -> push False s' c u b
+                | b, bdry          -> Skip (step s' u b)
+                | bdry             -> push False s' c u b
+                | b                -> Yield d (step s' u b)
+                | u, bdry || start -> push False s' c u b
+                | u, upper         -> push False s' c u b
+                | u                -> push True  s' c u b
+                | otherwise        -> Yield c (step s' u b)
               where
                 b = f c
                 u = Char.isUpper c
 
-    next (CC s a b) = Yield a (CC s b '\0')
+    next (T s a b c) = Yield a (T s b c '\0')
 
-    step s upper bnd   = push s upper bnd '\0'
-    push s upper bnd c = CC (False :*: upper :*: bnd :*: s) c '\0'
+    step s upper bdry = T (s :*: False :*: upper :*: bdry) '\0' '\0' '\0'
+
+    push delim s c upper bdry =
+        case m c (s :*: False :*: upper :*: bdry) of
+            Yield x (CC s' y z)
+                | delim     -> Yield d (T s' x y z)
+                | otherwise -> Yield x (T s' y z '\0')
+            _               -> Yield c (step s upper bdry)
 {-# INLINE transform #-}
 
-boundary :: Char -> Bool
-boundary c = Char.isSpace c || c == '-' || c == '_'
-{-# INLINE boundary #-}
+isBoundary :: Char -> Bool
+isBoundary c = Char.isSpace c || c == '-' || c == '_'
+{-# INLINE isBoundary #-}
 
 first :: (Stream Char -> Stream Char) -> Stream Char -> Stream Char
 first f s = maybe s (\(x, s') -> f (singleton x) `append` s') (uncons s)

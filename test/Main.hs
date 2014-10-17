@@ -1,4 +1,7 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ExtendedDefaultRules       #-}
+{-# LANGUAGE OverloadedStrings          #-}
+
+{-# OPTIONS_GHC -fno-warn-type-defaults #-}
 
 -- Module      : Main
 -- Copyright   : (c) 2014 Brendan Hay <brendan.g.hay@gmail.com>
@@ -17,9 +20,11 @@ import Data.Text.Case
 import Test.Tasty
 import Test.Tasty.HUnit
 
+default (Integer)
+
 main :: IO ()
 main = defaultMain $ testGroup "tests"
-    [ test "lowerFirst" lowerFirst
+    [ examples "lowerFirst" lowerFirst
         [ ""
         , "title cased phrase"
         , "camelCasedPhrase"
@@ -30,9 +35,11 @@ main = defaultMain $ testGroup "tests"
         , "1-Mixed_string AOK"
         , "a  double--stop__phrase"
         , "hTML5"
+        , "είναιΥπάρχουν πολλές-Αντίθετα"
+        , "je_obecněÚvodní-Španěl"
         ]
 
-    , test "upperFirst" upperFirst
+    , examples "upperFirst" upperFirst
         [ ""
         , "Title cased phrase"
         , "CamelCasedPhrase"
@@ -43,9 +50,11 @@ main = defaultMain $ testGroup "tests"
         , "1-Mixed_string AOK"
         , "A  double--stop__phrase"
         , "HTML5"
+        , "ΕίναιΥπάρχουν πολλές-Αντίθετα"
+        , "Je_obecněÚvodní-Španěl"
         ]
 
-    , test "toCamel" toCamel
+    , examples "toCamel" toCamel
         [ ""
         , "titleCasedPhrase"
         , "camelCasedPhrase"
@@ -56,9 +65,11 @@ main = defaultMain $ testGroup "tests"
         , "1MixedStringAOK"
         , "aDoubleStopPhrase"
         , "hTML5"
+        , "είναιΥπάρχουνΠολλέςΑντίθετα"
+        , "jeObecněÚvodníŠpaněl"
         ]
 
-    , test "toPascal" toPascal
+    , examples "toPascal" toPascal
         [ ""
         , "TitleCasedPhrase"
         , "CamelCasedPhrase"
@@ -69,9 +80,11 @@ main = defaultMain $ testGroup "tests"
         , "1MixedStringAOK"
         , "ADoubleStopPhrase"
         , "HTML5"
+        , "ΕίναιΥπάρχουνΠολλέςΑντίθετα"
+        , "JeObecněÚvodníŠpaněl"
         ]
 
-    , test "toSnake" toSnake
+    , examples "toSnake" toSnake
         [ ""
         , "title_cased_phrase"
         , "camel_cased_phrase"
@@ -82,9 +95,11 @@ main = defaultMain $ testGroup "tests"
         , "1_mixed_string_aok"
         , "a_double_stop_phrase"
         , "html5"
+        , "είναι_υπάρχουν_πολλές_αντίθετα"
+        , "je_obecně_úvodní_španěl"
         ]
 
-    , test "toSpinal" toSpinal
+    , examples "toSpinal" toSpinal
         [ ""
         , "title-cased-phrase"
         , "camel-cased-phrase"
@@ -95,9 +110,11 @@ main = defaultMain $ testGroup "tests"
         , "1-mixed-string-aok"
         , "a-double-stop-phrase"
         , "html5"
+        , "είναι-υπάρχουν-πολλές-αντίθετα"
+        , "je-obecně-úvodní-španěl"
         ]
 
-    , test "toTrain" toTrain
+    , examples "toTrain" toTrain
         [ ""
         , "Title-Cased-Phrase"
         , "Camel-Cased-Phrase"
@@ -108,9 +125,11 @@ main = defaultMain $ testGroup "tests"
         , "1-Mixed-String-AOK"
         , "A-Double-Stop-Phrase"
         , "HTML5"
+        , "Είναι-Υπάρχουν-Πολλές-Αντίθετα"
+        , "Je-Ubecně-Úvodní-Španěl"
         ]
 
-    , test "toHuman" toHuman
+    , examples "toHuman" toHuman
         [ ""
         , "Title cased phrase"
         , "Camel cased phrase"
@@ -121,25 +140,39 @@ main = defaultMain $ testGroup "tests"
         , "1 mixed string AOK"
         , "A double stop phrase"
         , "HTML5"
+        , "Είναι υπάρχουν πολλέςαντίθετα"
+        , "Je obecně úvodní španěl"
+        ]
+
+    , testGroup "toOrdinal"
+        [ testCase "1st"   ("1st"   @=? toOrdinal 1)
+        , testCase "2nd"   ("2nd"   @=? toOrdinal 2)
+        , testCase "3rd"   ("3rd"   @=? toOrdinal 3)
+        , testCase "4th"   ("4th"   @=? toOrdinal 4)
+        , testCase "5th"   ("5th"   @=? toOrdinal 5)
+        , testCase "21st"  ("21st"  @=? toOrdinal 21)
+        , testCase "33rd"  ("33rd"  @=? toOrdinal 33)
+        , testCase "102nd" ("102nd" @=? toOrdinal 102)
+        , testCase "203rd" ("203rd" @=? toOrdinal 203)
         ]
     ]
 
-examples :: [(String, Text)]
-examples =
-    [ ("Empty",       "")
-    , ("Title",       "Title cased phrase")
-    , ("Camel",       "camelCasedPhrase")
-    , ("Pascal",      "PascalCasedPhrase")
-    , ("Snake",       "snake_cased_phrase")
-    , ("Spinal",      "spinal-cased-phrase")
-    , ("Train",       "Train-Cased-Phrase")
-    , ("Mixed",       "1-Mixed_string AOK")
-    , ("Double Stop", "a  double--stop__phrase")
-    , ("Acronym",     "HTML5")
-    ]
+examples :: TestName -> (Text -> Text) -> [Text] -> TestTree
+examples n f = testGroup n . zipWith (run f) reference
+  where
+    run f (n, x) y = testCase n (y @=? f x)
 
-test :: TestName -> (Text -> Text) -> [Text] -> TestTree
-test n f = testGroup n . zipWith (run f) examples
-
-run :: (Text -> Text) -> (String, Text) -> Text -> TestTree
-run f (n, x) y = testCase n (y @=? f x)
+    reference =
+        [ ("Empty",       "")
+        , ("Title",       "Title cased phrase")
+        , ("Camel",       "camelCasedPhrase")
+        , ("Pascal",      "PascalCasedPhrase")
+        , ("Snake",       "snake_cased_phrase")
+        , ("Spinal",      "spinal-cased-phrase")
+        , ("Train",       "Train-Cased-Phrase")
+        , ("Mixed",       "1-Mixed_string AOK")
+        , ("Double Stop", "a  double--stop__phrase")
+        , ("Acronym",     "HTML5")
+        , ("Greek",       "ΕίναιΥπάρχουν πολλές-Αντίθετα")
+        , ("Czech",       "Je_obecněÚvodní-Španěl")
+        ]
