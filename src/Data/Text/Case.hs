@@ -23,6 +23,11 @@ import           Data.Text.Case.Types
 import qualified Data.Text.Lazy        as LText
 import qualified Data.Text.Lazy.Case   as LCase
 
+-- FIXME: maybe have an acronym table like inflector?
+-- affects the streaming .. perhaps applied as after-effect, opt-in
+-- upperAcronyms
+-- lowerAcronyms
+
 -- Re-exports
 -- toLower
 -- toTitle
@@ -31,32 +36,23 @@ import qualified Data.Text.Lazy.Case   as LCase
 -- if this used the same rules as 'transform/normalise' an acronym would
 -- also be taken as the first word
 takeWord :: Text -> Text
-takeWord = undefined
+takeWord = strict Fusion.takeWord
 
-dropWord :: Text -> Text
-dropWord t = fromMaybe t (stripWord t)
+-- dropWord :: Text -> Text
+-- dropWord t = fromMaybe t (stripWord t)
 
--- | Return the suffix after the first word boundary is encountered. If not
--- boundary is found, then 'Nothing'.
-stripWord :: Text -> Maybe Text
-stripWord = undefined
+-- -- | Return the suffix after the first word boundary is encountered. If not
+-- -- boundary is found, then 'Nothing'.
+-- stripWord :: Text -> Maybe Text
+-- stripWord = undefined
 
--- investiagate how 'Data.Text.splitOn' doesn't copy substrings
--- | Split into a list delimited by word boundaries.
-splitWords :: Text -> [Text]
-splitWords = undefined
+-- -- investiagate how 'Data.Text.splitOn' doesn't copy substrings
+-- -- | Split into a list delimited by word boundaries.
+-- splitWords :: Text -> [Text]
+-- splitWords = undefined
 
-indentLines :: Int -> Text -> Text
-indentLines = undefined
-
--- FIXME: get the upper/lowerMapping working as parameter to transform
-
--- FIXME: add some unicode tests
-
--- FIXME: maybe have an acronym table like inflector?
--- affects the streaming .. perhaps applied as after-effect, opt-in
--- upperAcronyms
--- lowerAcronyms
+-- indentLines :: Int -> Text -> Text
+-- indentLines = undefined
 
 lowerFirst :: Text -> Text
 lowerFirst = strict Fusion.lowerFirst

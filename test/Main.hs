@@ -20,11 +20,24 @@ import Data.Text.Case
 import Test.Tasty
 import Test.Tasty.HUnit
 
-default (Integer)
-
 main :: IO ()
 main = defaultMain $ testGroup "tests"
-    [ examples "lowerFirst" lowerFirst
+    [ examples "takeWord" takeWord
+        [ ""
+        , "Title"
+        , "camel"
+        , "Pascal"
+        , "snake"
+        , "spinal"
+        , "Train"
+        , "1"
+        , "a"
+        , "HTML5"
+        , "Είναι"
+        , "Je"
+        ]
+
+    , examples "lowerFirst" lowerFirst
         [ ""
         , "title cased phrase"
         , "camelCasedPhrase"

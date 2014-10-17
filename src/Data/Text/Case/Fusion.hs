@@ -23,6 +23,77 @@ import           Data.Text.Internal.Fusion.Types
 import qualified Data.Text.Internal.Lazy.Fusion        as LFusion
 import qualified Data.Text.Lazy                        as LText
 
+-- | O(n) Returns the first word from a stream, or the entire stream itself
+-- if no word boundary is encountered.
+takeWord :: Stream Char -> Stream Char
+takeWord (Stream next0 s0 len) =
+    Stream next (True :*: False :*: s0) len -- HINT maybe too high
+  where
+    next (start :*: upper :*: s) =
+        case next0 s of
+            Done            -> Done
+            Skip s'         -> Skip (start :*: upper :*: s')
+            Yield c s'
+                | b, start  -> Skip step
+                | u, start  -> Yield c step
+                | b         -> Done
+                | upper     -> Yield c step
+                | u         -> Done
+                | otherwise -> Yield c step
+              where
+                step = False :*: u :*: s'
+
+                b = isBoundary c
+                u = Char.isUpper c
+{-# INLINE takeWord #-}
+
+-- take :: Integral a => a -> Stream Char -> Stream Char
+-- take n0 (Stream next0 s0 len) =
+--     Stream next (n0 :*: s0) (smaller len (fromIntegral (max 0 n0)))
+--   where
+--     next (n :*: s)
+--         | n <= 0    = Done
+--         | otherwise = case next0 s of
+--             Done -> Done
+--             Skip s' -> Skip (n :*: s')
+--             Yield x s' -> Yield x ((n-1) :*: s')
+
+-- stripWord :: Stream Char -> Maybe (Stream Char)
+-- stripWord (Stream next0 s0 len) = go
+--   where
+--     next !s = case next0 s of
+--         Done    -> Nothing
+--         Skip s' -> next s
+--         Yield c s'
+--             | isBoundary c -> Just (Stream next s' len)
+--             | otherwise    -> 
+
+-- drop :: Integral a => a -> Stream Char -> Stream Char
+-- drop n0 (Stream next0 s0 len) =
+--     Stream next (J n0 :*: s0) (len - fromIntegral (max 0 n0))
+--   where
+--     {-# INLINE next #-}
+--     next (J n :*: s)
+--       | n <= 0    = Skip (N :*: s)
+--       | otherwise = case next0 s of
+--           Done       -> Done
+--           Skip    s' -> Skip (J n    :*: s')
+--           Yield _ s' -> Skip (J (n-1) :*: s')
+--     next (N :*: s) = case next0 s of
+--       Done       -> Done
+--       Skip    s' -> Skip    (N :*: s')
+--       Yield x s' -> Yield x (N :*: s')
+-- {-# INLINE [0] drop #-}
+
+-- uncons (Stream next s0 len) = loop_uncons s0
+--     where
+--       loop_uncons !s = case next s of
+--                          Yield x s1 -> Just (x, Stream next s1 (len-1))
+--                          Skip s'    -> loop_uncons s'
+--                          Done       -> Nothing
+-- {-# INLINE stripWord #-}
+
+
 lowerFirst :: Stream Char -> Stream Char
 lowerFirst = first toLower
 {-# INLINE lowerFirst #-}
