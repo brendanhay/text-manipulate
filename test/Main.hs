@@ -158,9 +158,9 @@ main = defaultMain $ testGroup "tests"
     ]
 
 examples :: TestName -> (Text -> Text) -> [Text] -> TestTree
-examples n f = testGroup n . zipWith (run f) reference
+examples n f = testGroup n . zipWith run reference
   where
-    run f (n, x) y = testCase n (y @=? f x)
+    run (c, x) y = testCase c (y @=? f x)
 
     reference =
         [ ("Empty",       "")

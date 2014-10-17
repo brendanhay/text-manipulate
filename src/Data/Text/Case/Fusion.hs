@@ -70,14 +70,14 @@ normalise :: (Char -> Bool) -- ^ Boundary predicate
 normalise f (Stream next0 s0 len) =
     Stream next (CC (False :*: s0) '\0' '\0') len
   where
-    next (CC (bnd :*: s) '\0' _) =
+    next (CC (bdry :*: s) '\0' _) =
         case next0 s of
             Done            -> Done
-            Skip s'         -> Skip    (CC (bnd :*: s') '\0' '\0')
+            Skip s'         -> Skip    (CC (bdry :*: s') '\0' '\0')
             Yield c s'
-                | bnd       -> upperMapping c (b :*: s')
-                | b         -> Skip    (CC (b   :*: s') '\0' '\0')
-                | otherwise -> Yield c (CC (b   :*: s') '\0' '\0')
+                | b         -> Skip    (CC    (b :*: s') '\0' '\0')
+                | bdry      -> upperMapping c (b :*: s')
+                | otherwise -> Yield c (CC    (b :*: s') '\0' '\0')
               where
                 b = f c
 
