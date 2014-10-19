@@ -67,16 +67,16 @@
     , isWordBoundary
     ) where
 
-import qualified Data.Char                   as Char
-import           Data.List                   (intersperse)
+import qualified Data.Char                            as Char
+import           Data.List                            (intersperse)
 import           Data.Monoid
-import           Data.Text                   (Text)
-import qualified Data.Text                   as Text
-import qualified Data.Text.Lazy              as LText
-import qualified Data.Text.Lazy.Manipulate   as LMan
-import           Data.Text.Manipulate.Fusion (strict)
-import qualified Data.Text.Manipulate.Fusion as Fusion
-import           Data.Text.Manipulate.Types
+import           Data.Text                            (Text)
+import qualified Data.Text                            as Text
+import qualified Data.Text.Lazy                       as LText
+import qualified Data.Text.Lazy.Manipulate            as LMan
+import           Data.Text.Manipulate.Internal.Fusion (strict)
+import qualified Data.Text.Manipulate.Internal.Fusion as Fusion
+import           Data.Text.Manipulate.Internal.Types
 
 -- $strict
 -- This library provides functions for manipulating both strict and lazy Text types.

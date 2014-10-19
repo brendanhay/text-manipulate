@@ -2,7 +2,7 @@
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE RankNTypes   #-}
 
--- Module      : Data.Text.Manipulate.Fusion
+-- Module      : Data.Text.Manipulate.Internal.Fusion
 -- Copyright   : (c) 2014 Brendan Hay <brendan.g.hay@gmail.com>
 -- License     : This Source Code Form is subject to the terms of
 --               the Mozilla Public License, v. 2.0.
@@ -12,7 +12,7 @@
 -- Stability   : experimental
 -- Portability : non-portable (GHC extensions)
 
-module Data.Text.Manipulate.Fusion where
+module Data.Text.Manipulate.Internal.Fusion where
 
 import qualified Data.Char                             as Char
 import           Data.Text                             (Text)
@@ -22,7 +22,7 @@ import           Data.Text.Internal.Fusion.Common
 import           Data.Text.Internal.Fusion.Types
 import qualified Data.Text.Internal.Lazy.Fusion        as LFusion
 import qualified Data.Text.Lazy                        as LText
-import           Data.Text.Manipulate.Types
+import           Data.Text.Manipulate.Internal.Types
 
 takeWord :: Stream Char -> Stream Char
 takeWord = transform (const Done) yield . tokenise

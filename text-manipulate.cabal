@@ -40,8 +40,8 @@ library
         , Data.Text.Lazy.Manipulate
 
     other-modules:
-          Data.Text.Manipulate.Fusion
-        , Data.Text.Manipulate.Types
+          Data.Text.Manipulate.Internal.Fusion
+        , Data.Text.Manipulate.Internal.Types
 
     build-depends:
           base        >= 4.5 && < 5.0

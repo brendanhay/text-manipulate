@@ -67,16 +67,17 @@ module Data.Text.Lazy.Manipulate
     , isWordBoundary
     ) where
 
-import qualified Data.Char              as Char
-import           Data.List              (intersperse)
+
+import qualified Data.Char                            as Char
+import           Data.List                            (intersperse)
 import           Data.Monoid
 import           Data.Text.Buildable
-import           Data.Text.Manipulate.Fusion  (lazy)
-import qualified Data.Text.Manipulate.Fusion  as Fusion
-import           Data.Text.Manipulate.Types
-import           Data.Text.Lazy         (Text)
-import qualified Data.Text.Lazy         as LText
-import           Data.Text.Lazy.Builder (toLazyText)
+import           Data.Text.Lazy                       (Text)
+import qualified Data.Text.Lazy                       as LText
+import           Data.Text.Lazy.Builder               (toLazyText)
+import           Data.Text.Manipulate.Internal.Fusion (lazy)
+import qualified Data.Text.Manipulate.Internal.Fusion as Fusion
+import           Data.Text.Manipulate.Internal.Types
 
 -- $strict
 -- This library provides functions for manipulating both strict and lazy Text types.
