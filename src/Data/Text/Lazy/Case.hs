@@ -78,8 +78,8 @@ import           Data.Text.Lazy.Builder (toLazyText)
 
 -- $strict
 -- This library provides functions for manipulating both strict and lazy Text types.
--- The strict type is provided by the "Data.Text.Case" module, while the lazy
--- type is provided by the "Data.Text.Lazy.Case" module.
+-- The strict functions are provided by the "Data.Text.Case" module, while the lazy
+-- functions are provided by the "Data.Text.Lazy.Case" module.
 
 -- $unicode
 -- While this library to support Unicode in a similar fashion to the
