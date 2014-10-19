@@ -2,7 +2,7 @@
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE RankNTypes   #-}
 
--- Module      : Data.Text.Case.Fusion
+-- Module      : Data.Text.Manipulate.Fusion
 -- Copyright   : (c) 2014 Brendan Hay <brendan.g.hay@gmail.com>
 -- License     : This Source Code Form is subject to the terms of
 --               the Mozilla Public License, v. 2.0.
@@ -12,17 +12,17 @@
 -- Stability   : experimental
 -- Portability : non-portable (GHC extensions)
 
-module Data.Text.Case.Fusion where
+module Data.Text.Manipulate.Fusion where
 
 import qualified Data.Char                             as Char
 import           Data.Text                             (Text)
-import           Data.Text.Case.Types
 import qualified Data.Text.Internal.Fusion             as Fusion
 import           Data.Text.Internal.Fusion.CaseMapping (upperMapping, lowerMapping)
 import           Data.Text.Internal.Fusion.Common
 import           Data.Text.Internal.Fusion.Types
 import qualified Data.Text.Internal.Lazy.Fusion        as LFusion
 import qualified Data.Text.Lazy                        as LText
+import           Data.Text.Manipulate.Types
 
 takeWord :: Stream Char -> Stream Char
 takeWord = transform (const Done) yield . tokenise

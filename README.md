@@ -1,5 +1,4 @@
-# Text Case Conversion
+# Text Manipulate
 
-Manipulate programmatic identifiers and structurally non-complex pieces
-of text by delimiting word boundaries via a combination of whitespace,
-control-characters, and case-sensitivity.
+Manipulate identifiers and structurally non-complex pieces text by delimiting
+word boundaries via a combination of whitespace, ontrol-characters, and case-sensitivity.

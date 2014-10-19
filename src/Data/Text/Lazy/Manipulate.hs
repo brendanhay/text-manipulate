@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ViewPatterns      #-}
 
--- Module      : Data.Text.Lazy.Case
+-- Module      : Data.Text.Lazy.Manipulate
 -- Copyright   : (c) 2014 Brendan Hay <brendan.g.hay@gmail.com>
 -- License     : This Source Code Form is subject to the terms of
 --               the Mozilla Public License, v. 2.0.
@@ -11,14 +11,14 @@
 -- Stability   : experimental
 -- Portability : non-portable (GHC extensions)
 
--- | Manipulate programmatic identifiers and structurally non-complex pieces
+-- | Manipulate identifiers and structurally non-complex pieces
 -- of text by delimiting word boundaries via a combination of whitespace,
 -- control-characters, and case-sensitivity.
 --
 -- Assumptions have been made about word boundary characteristics inherint
 -- in predominantely English text, please see individual function documentation
 -- for further details and behaviour.
-module Data.Text.Lazy.Case
+module Data.Text.Lazy.Manipulate
     (
     -- * Strict vs lazy types
     -- $strict
@@ -73,17 +73,17 @@ import qualified Data.Char              as Char
 import           Data.List              (intersperse)
 import           Data.Monoid
 import           Data.Text.Buildable
-import           Data.Text.Case.Fusion  (lazy)
-import qualified Data.Text.Case.Fusion  as Fusion
-import           Data.Text.Case.Types
+import           Data.Text.Manipulate.Fusion  (lazy)
+import qualified Data.Text.Manipulate.Fusion  as Fusion
+import           Data.Text.Manipulate.Types
 import           Data.Text.Lazy         (Text)
 import qualified Data.Text.Lazy         as LText
 import           Data.Text.Lazy.Builder (toLazyText)
 
 -- $strict
 -- This library provides functions for manipulating both strict and lazy Text types.
--- The strict functions are provided by the "Data.Text.Case" module, while the lazy
--- functions are provided by the "Data.Text.Lazy.Case" module.
+-- The strict functions are provided by the "Data.Text.Manipulate" module, while the lazy
+-- functions are provided by the "Data.Text.Lazy.Manipulate" module.
 
 -- $unicode
 -- While this library supports Unicode in a similar fashion to the
