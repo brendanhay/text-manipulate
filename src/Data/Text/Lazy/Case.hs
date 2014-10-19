@@ -29,8 +29,17 @@ module Data.Text.Lazy.Case
     -- * Fusion
     -- $fusion
 
+    -- * Subwords
+    -- ** Removing words
+      takeWord
+    , dropWord
+    , stripWord
+    -- ** Breaking on words
+    , breakWord
+    , splitWords
+
     -- * Character manipulation
-      lowerHead
+    , lowerHead
     , upperHead
     , mapHead
     , isBoundary
@@ -39,15 +48,6 @@ module Data.Text.Lazy.Case
     -- * Line manipulation
     , indentLines
     , prependLines
-
-    -- * Subwords
-    -- ** Removing words
-    , takeWord
-    , dropWord
-    , stripWord
-    -- ** Breaking on words
-    , breakWord
-    , splitWords
 
     -- * Acronyms
     , toAcronym
@@ -63,6 +63,10 @@ module Data.Text.Lazy.Case
     , toSnake
     , toSpinal
     , toTrain
+
+    -- * Boundary predicates
+    , isBoundary
+    , isWordBoundary
     ) where
 
 import qualified Data.Char              as Char
@@ -82,7 +86,7 @@ import           Data.Text.Lazy.Builder (toLazyText)
 -- functions are provided by the "Data.Text.Lazy.Case" module.
 
 -- $unicode
--- While this library to support Unicode in a similar fashion to the
+-- While this library supports Unicode in a similar fashion to the
 -- underlying <http://hackage.haskell.org/package/text text> library,
 -- more Unicode specific handling of word boundaries can be found in the
 -- <http://hackage.haskell.org/package/text-icu text-icu> library.

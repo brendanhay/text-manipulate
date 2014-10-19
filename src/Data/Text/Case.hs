@@ -31,7 +31,7 @@
 
     -- * Subwords
     -- ** Removing words
-    , takeWord
+      takeWord
     , dropWord
     , stripWord
     -- ** Breaking on words
@@ -39,11 +39,9 @@
     , splitWords
 
     -- * Character manipulation
-      lowerHead
+    , lowerHead
     , upperHead
     , mapHead
-    , isBoundary
-    , isWordBoundary
 
     -- * Line manipulation
     , indentLines
@@ -63,6 +61,10 @@
     , toSnake
     , toSpinal
     , toTrain
+
+    -- * Boundary predicates
+    , isBoundary
+    , isWordBoundary
     ) where
 
 import qualified Data.Char             as Char
