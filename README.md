@@ -5,5 +5,5 @@ of text by delimiting word boundaries via a combination of whitespace,
 control-characters, and case-sensitivity.
 
 Has support for common idioms like casing of programmatic variable names,
-taking, dropping, and splitting by words, and modifying the first character
+taking, dropping, and splitting text by word, and modifying the first character
 of a piece of text.
