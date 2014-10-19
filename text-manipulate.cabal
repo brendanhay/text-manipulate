@@ -7,7 +7,7 @@ license-file:          LICENSE
 author:                Brendan Hay
 maintainer:            brendan.g.hay@gmail.com
 copyright:             Copyright (c) 2014 Brendan Hay
-category:              Data
+category:              Data, Text
 build-type:            Simple
 extra-source-files:    README.md
 cabal-version:         >= 1.10
