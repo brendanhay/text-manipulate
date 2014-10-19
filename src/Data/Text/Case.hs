@@ -11,10 +11,24 @@
 -- Stability   : experimental
 -- Portability : non-portable (GHC extensions)
 
--- | Most of the functions in this module are subject to fusion, meaning that
--- a pipeline of such functions will usually allocate at most one Text value.
+-- | Manipulate programmatic identifiers and structurally non-complex pieces
+-- of text by delimiting word boundaries via a combination of whitespace,
+-- control-characters, and case-sensitivity.
+--
+-- Assumptions have been made about word boundary characteristics inherint
+-- in predominantely English text, please see individual function documentation
+-- for further details and behaviour.
  module Data.Text.Case
     (
+    -- * Strict vs lazy types
+    -- $strict
+
+    -- * Unicode
+    -- $unicode
+
+    -- * Fusion
+    -- $fusion
+
     -- * Character manipulation
       lowerHead
     , upperHead
@@ -61,6 +75,24 @@ import qualified Data.Text.Case.Fusion as Fusion
 import           Data.Text.Case.Types
 import qualified Data.Text.Lazy        as LText
 import qualified Data.Text.Lazy.Case   as LCase
+
+-- $strict
+-- This library provides functions for manipulating both strict and lazy Text types.
+-- The strict type is provided by the "Data.Text.Case" module, while the lazy
+-- type is provided by the "Data.Text.Lazy.Case" module.
+
+-- $unicode
+-- While this library to support Unicode in a similar fashion to the
+-- underlying <http://hackage.haskell.org/package/text text> library,
+-- more Unicode specific handling of word boundaries can be found in the
+-- <http://hackage.haskell.org/package/text-icu text-icu> library.
+
+-- $fusion
+-- Alot of the functions in this module are subject to fusion, meaning that
+-- a pipeline of such functions will usually allocate at most one Text value.
+--
+-- Functions that can be fused by the compiler are documented with the
+-- phrase /Subject to fusion/.
 
 -- DEBUG:
 -- import Data.Text.Internal.Fusion        (stream)
