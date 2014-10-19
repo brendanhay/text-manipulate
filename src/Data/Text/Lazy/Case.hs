@@ -88,7 +88,7 @@ import           Data.Text.Lazy.Builder (toLazyText)
 -- <http://hackage.haskell.org/package/text-icu text-icu> library.
 
 -- $fusion
--- Alot of the functions in this module are subject to fusion, meaning that
+-- Many functions in this module are subject to fusion, meaning that
 -- a pipeline of such functions will usually allocate at most one Text value.
 --
 -- Functions that can be fused by the compiler are documented with the
