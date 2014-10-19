@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ViewPatterns      #-}
 
--- Module      : Data.Text.Case
+-- Module      : Data.Text.Manipulate
 -- Copyright   : (c) 2014 Brendan Hay <brendan.g.hay@gmail.com>
 -- License     : This Source Code Form is subject to the terms of
 --               the Mozilla Public License, v. 2.0.
@@ -18,7 +18,7 @@
 -- Assumptions have been made about word boundary characteristics inherint
 -- in predominantely English text, please see individual function documentation
 -- for further details and behaviour.
- module Data.Text.Case
+ module Data.Text.Manipulate
     (
     -- * Strict vs lazy types
     -- $strict
@@ -67,16 +67,16 @@
     , isWordBoundary
     ) where
 
-import qualified Data.Char             as Char
-import           Data.List             (intersperse)
+import qualified Data.Char                   as Char
+import           Data.List                   (intersperse)
 import           Data.Monoid
-import           Data.Text             (Text)
-import qualified Data.Text             as Text
-import           Data.Text.Case.Fusion (strict)
-import qualified Data.Text.Case.Fusion as Fusion
-import           Data.Text.Case.Types
-import qualified Data.Text.Lazy        as LText
-import qualified Data.Text.Lazy.Case   as LCase
+import           Data.Text                   (Text)
+import qualified Data.Text                   as Text
+import qualified Data.Text.Lazy              as LText
+import qualified Data.Text.Lazy.Manipulate   as LMan
+import           Data.Text.Manipulate.Fusion (strict)
+import qualified Data.Text.Manipulate.Fusion as Fusion
+import           Data.Text.Manipulate.Types
 
 -- $strict
 -- This library provides functions for manipulating both strict and lazy Text types.
@@ -204,7 +204,7 @@ toAcronym (Text.filter Char.isUpper -> x)
 -- >>> toOrdinal (12 :: Int)
 -- "12th"
 toOrdinal :: Integral a => a -> Text
-toOrdinal = LText.toStrict . LCase.toOrdinal
+toOrdinal = LText.toStrict . LMan.toOrdinal
 
 -- | O(n) Convert casing to @Title Cased Phrase@. /Subject to fusion./
 toTitle :: Text -> Text

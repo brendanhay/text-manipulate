@@ -42,8 +42,6 @@ module Data.Text.Lazy.Manipulate
     , lowerHead
     , upperHead
     , mapHead
-    , isBoundary
-    , isWordBoundary
 
     -- * Line manipulation
     , indentLines
