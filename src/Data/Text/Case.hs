@@ -206,7 +206,7 @@ toAcronym (Text.filter Char.isUpper -> x)
 toOrdinal :: Integral a => a -> Text
 toOrdinal = LText.toStrict . LCase.toOrdinal
 
--- | O(n) Convert casing to @Titled Cased Phrase@. /Subject to fusion./
+-- | O(n) Convert casing to @Title Cased Phrase@. /Subject to fusion./
 toTitle :: Text -> Text
 toTitle = strict Fusion.toTitle
 

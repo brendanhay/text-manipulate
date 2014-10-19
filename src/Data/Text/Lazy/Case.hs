@@ -200,7 +200,7 @@ toAcronym (LText.filter Char.isUpper -> x)
 toOrdinal :: Integral a => a -> Text
 toOrdinal = toLazyText . build . Ordinal
 
--- | O(n) Convert casing to @Titled Cased Phrase@. /Subject to fusion./
+-- | O(n) Convert casing to @Title Cased Phrase@. /Subject to fusion./
 toTitle :: Text -> Text
 toTitle = lazy Fusion.toTitle
 
