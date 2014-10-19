@@ -19,6 +19,8 @@ git checkout gh-pages
 
 mv $DOCDIR/* .
 
+rm -f benchmark.html
+
 git add *.html *.js *.css *.gif *.png
 git commit -m "Generated documentation from $HEAD on $branch"
 git push origin gh-pages
