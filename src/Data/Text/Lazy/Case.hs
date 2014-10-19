@@ -19,6 +19,8 @@ module Data.Text.Lazy.Case
       lowerHead
     , upperHead
     , mapHead
+    , isBoundary
+    , isWordBoundary
 
     -- * Line manpipulation
     , indentLines

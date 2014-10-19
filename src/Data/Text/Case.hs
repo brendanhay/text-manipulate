@@ -19,6 +19,8 @@
       lowerHead
     , upperHead
     , mapHead
+    , isBoundary
+    , isWordBoundary
 
     -- * Line manpipulation
     , indentLines

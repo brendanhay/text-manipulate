@@ -16,12 +16,11 @@ module Main (main) where
 
 import           Criterion
 import           Criterion.Main
-import           Data.List            (intersperse)
+import           Data.List      (intersperse)
 import           Data.Monoid
-import           Data.Text            (Text)
-import qualified Data.Text            as Text
+import           Data.Text      (Text)
+import qualified Data.Text      as Text
 import           Data.Text.Case
-import           Data.Text.Case.Types
 
 main :: IO ()
 main = defaultMain
