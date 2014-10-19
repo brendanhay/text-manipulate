@@ -36,7 +36,7 @@
     , isBoundary
     , isWordBoundary
 
-    -- * Line manpipulation
+    -- * Line manipulation
     , indentLines
     , prependLines
 
@@ -79,7 +79,7 @@ import qualified Data.Text.Lazy.Case   as LCase
 -- $strict
 -- This library provides functions for manipulating both strict and lazy Text types.
 -- The strict functions are provided by the "Data.Text.Case" module, while the lazy
--- functions  are provided by the "Data.Text.Lazy.Case" module.
+-- functions are provided by the "Data.Text.Lazy.Case" module.
 
 -- $unicode
 -- While this library to support Unicode in a similar fashion to the
@@ -193,7 +193,7 @@ toAcronym (Text.filter Char.isUpper -> x)
     | Text.length x > 1 = Just x
     | otherwise         = Nothing
 
--- | Build an ordinal used to denote the position in an ordered sequence.
+-- | Render an ordinal used to denote the position in an ordered sequence.
 -- @toOrdinal == build . Ordinal@.
 --
 -- >>> toOrdinal (101 :: Int)
