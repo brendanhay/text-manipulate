@@ -22,22 +22,7 @@ import Test.Tasty.HUnit
 
 main :: IO ()
 main = defaultMain $ testGroup "tests"
-    [ examples "takeWord" takeWord
-        [ ""
-        , "Title"
-        , "camel"
-        , "Pascal"
-        , "snake"
-        , "spinal"
-        , "Train"
-        , "1"
-        , "a"
-        , "HTML5"
-        , "Είναι"
-        , "Je"
-        ]
-
-    , examples "lowerFirst" lowerFirst
+    [ exampleGroup "lowerHead" lowerHead
         [ ""
         , "title cased phrase"
         , "camelCasedPhrase"
@@ -52,7 +37,7 @@ main = defaultMain $ testGroup "tests"
         , "je_obecněÚvodní-Španěl"
         ]
 
-    , examples "upperFirst" upperFirst
+    , exampleGroup "upperHead" upperHead
         [ ""
         , "Title cased phrase"
         , "CamelCasedPhrase"
@@ -67,7 +52,76 @@ main = defaultMain $ testGroup "tests"
         , "Je_obecněÚvodní-Španěl"
         ]
 
-    , examples "toCamel" toCamel
+    , exampleGroup "takeWord" takeWord
+        [ ""
+        , "Title"
+        , "camel"
+        , "Pascal"
+        , "snake"
+        , "spinal"
+        , "Train"
+        , "1"
+        , "a"
+        , "HTML5"
+        , "Είναι"
+        , "Je"
+        ]
+
+    , exampleGroup "dropWord" dropWord
+        [ ""
+        , "cased phrase"
+        , "CasedPhrase"
+        , "CasedPhrase"
+        , "cased_phrase"
+        , "cased-phrase"
+        , "Cased-Phrase"
+        , "Mixed_string AOK"
+        , "double-stop_phrase"
+        , ""
+        , "Υπάρχουν πολλές-Αντίθετα"
+        , "obecněÚvodní-Španěl"
+        ]
+
+    , exampleGroup "stripWord" stripWord
+        [ Nothing
+        , Just "cased phrase"
+        , Just "CasedPhrase"
+        , Just "CasedPhrase"
+        , Just "cased_phrase"
+        , Just "cased-phrase"
+        , Just "Cased-Phrase"
+        , Just "Mixed_string AOK"
+        , Just "double-stop_phrase"
+        , Just ""
+        , Just "Υπάρχουν πολλές-Αντίθετα"
+        , Just "obecněÚvodní-Španěl"
+        ]
+
+    , testGroup "splitWords"
+        [
+        ]
+
+    , testGroup "indentLines"
+        [
+        ]
+
+    , testGroup "toAcronym"
+        [
+        ]
+
+    , testGroup "toOrdinal"
+        [ testCase "1st"   ("1st"   @=? toOrdinal 1)
+        , testCase "2nd"   ("2nd"   @=? toOrdinal 2)
+        , testCase "3rd"   ("3rd"   @=? toOrdinal 3)
+        , testCase "4th"   ("4th"   @=? toOrdinal 4)
+        , testCase "5th"   ("5th"   @=? toOrdinal 5)
+        , testCase "21st"  ("21st"  @=? toOrdinal 21)
+        , testCase "33rd"  ("33rd"  @=? toOrdinal 33)
+        , testCase "102nd" ("102nd" @=? toOrdinal 102)
+        , testCase "203rd" ("203rd" @=? toOrdinal 203)
+        ]
+
+    , exampleGroup "toCamel" toCamel
         [ ""
         , "titleCasedPhrase"
         , "camelCasedPhrase"
@@ -82,7 +136,7 @@ main = defaultMain $ testGroup "tests"
         , "jeObecněÚvodníŠpaněl"
         ]
 
-    , examples "toPascal" toPascal
+    , exampleGroup "toPascal" toPascal
         [ ""
         , "TitleCasedPhrase"
         , "CamelCasedPhrase"
@@ -97,7 +151,7 @@ main = defaultMain $ testGroup "tests"
         , "JeObecněÚvodníŠpaněl"
         ]
 
-    , examples "toSnake" toSnake
+    , exampleGroup "toSnake" toSnake
         [ ""
         , "title_cased_phrase"
         , "camel_cased_phrase"
@@ -112,7 +166,7 @@ main = defaultMain $ testGroup "tests"
         , "je_obecně_úvodní_španěl"
         ]
 
-    , examples "toSpinal" toSpinal
+    , exampleGroup "toSpinal" toSpinal
         [ ""
         , "title-cased-phrase"
         , "camel-cased-phrase"
@@ -127,7 +181,7 @@ main = defaultMain $ testGroup "tests"
         , "je-obecně-úvodní-španěl"
         ]
 
-    , examples "toTrain" toTrain
+    , exampleGroup "toTrain" toTrain
         [ ""
         , "Title-Cased-Phrase"
         , "Camel-Cased-Phrase"
@@ -139,39 +193,27 @@ main = defaultMain $ testGroup "tests"
         , "A-Double-Stop-Phrase"
         , "HTML5"
         , "Είναι-Υπάρχουν-Πολλές-Αντίθετα"
-        , "Je-Ubecně-Úvodní-Španěl"
+        , "Je-Obecně-Úvodní-Španěl"
         ]
 
-    , examples "toHuman" toHuman
+    , exampleGroup "toTitle" toTitle
         [ ""
-        , "Title cased phrase"
-        , "Camel cased phrase"
-        , "Pascal cased phrase"
-        , "Snake cased phrase"
-        , "Spinal cased phrase"
-        , "Train cased phrase"
-        , "1 mixed string AOK"
-        , "A double stop phrase"
+        , "Title Cased Phrase"
+        , "Camel Cased Phrase"
+        , "Pascal Cased Phrase"
+        , "Snake Cased Phrase"
+        , "Spinal Cased Phrase"
+        , "Train Cased Phrase"
+        , "1 Mixed String AOK"
+        , "A Double Stop Phrase"
         , "HTML5"
-        , "Είναι υπάρχουν πολλέςαντίθετα"
-        , "Je obecně úvodní španěl"
-        ]
-
-    , testGroup "toOrdinal"
-        [ testCase "1st"   ("1st"   @=? toOrdinal 1)
-        , testCase "2nd"   ("2nd"   @=? toOrdinal 2)
-        , testCase "3rd"   ("3rd"   @=? toOrdinal 3)
-        , testCase "4th"   ("4th"   @=? toOrdinal 4)
-        , testCase "5th"   ("5th"   @=? toOrdinal 5)
-        , testCase "21st"  ("21st"  @=? toOrdinal 21)
-        , testCase "33rd"  ("33rd"  @=? toOrdinal 33)
-        , testCase "102nd" ("102nd" @=? toOrdinal 102)
-        , testCase "203rd" ("203rd" @=? toOrdinal 203)
+        , "ΕίναιΥπάρχουν πολλές Αντίθετα"
+        , "Je Obecně Úvodní Španěl"
         ]
     ]
 
-examples :: TestName -> (Text -> Text) -> [Text] -> TestTree
-examples n f = testGroup n . zipWith run reference
+exampleGroup :: (Show a, Eq a) => TestName -> (Text -> a) -> [a] -> TestTree
+exampleGroup n f = testGroup n . zipWith run reference
   where
     run (c, x) y = testCase c (y @=? f x)
 

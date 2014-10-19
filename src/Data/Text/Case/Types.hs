@@ -13,9 +13,10 @@
 
 module Data.Text.Case.Types where
 
-import Control.Monad
-import Data.Monoid
-import Data.Text.Buildable
+import           Control.Monad
+import qualified Data.Char           as Char
+import           Data.Monoid
+import           Data.Text.Buildable
 
 newtype Ordinal a = Ordinal a
 
@@ -29,3 +30,9 @@ instance Integral a => Buildable (Ordinal a) where
             | otherwise         = "th"
 
         (flip mod 100 -> x, flip mod 10 -> y) = join (,) (abs n)
+
+isBoundary :: Char -> Bool
+isBoundary c = Char.isSpace c || c == '-' || c == '_'
+
+isWordBoundary :: Char -> Bool
+isWordBoundary c = isBoundary c || Char.isUpper c

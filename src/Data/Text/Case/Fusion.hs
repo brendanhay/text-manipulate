@@ -16,192 +16,162 @@ module Data.Text.Case.Fusion where
 
 import qualified Data.Char                             as Char
 import           Data.Text                             (Text)
+import           Data.Text.Case.Types
 import qualified Data.Text.Internal.Fusion             as Fusion
-import           Data.Text.Internal.Fusion.CaseMapping (upperMapping, lowerMapping, titleMapping)
+import           Data.Text.Internal.Fusion.CaseMapping (upperMapping, lowerMapping)
 import           Data.Text.Internal.Fusion.Common
 import           Data.Text.Internal.Fusion.Types
 import qualified Data.Text.Internal.Lazy.Fusion        as LFusion
 import qualified Data.Text.Lazy                        as LText
 
--- | O(n) Returns the first word from a stream, or the entire stream itself
--- if no word boundary is encountered.
 takeWord :: Stream Char -> Stream Char
-takeWord (Stream next0 s0 len) =
-    Stream next (True :*: False :*: s0) len -- HINT maybe too high
+takeWord = transform (const Done) yield . tokenise
+{-# INLINE [0] takeWord #-}
+
+dropWord :: Stream Char -> Stream Char
+dropWord (tokenise -> Stream next0 s0 len) = Stream next (True :*: s0) len
   where
-    next (start :*: upper :*: s) =
+    next (skip :*: s) =
         case next0 s of
-            Done            -> Done
-            Skip s'         -> Skip (start :*: upper :*: s')
-            Yield c s'
-                | b, start  -> Skip step
-                | u, start  -> Yield c step
-                | b         -> Done
-                | upper     -> Yield c step
-                | u         -> Done
-                | otherwise -> Yield c step
-              where
-                step = False :*: u :*: s'
+            Done       -> Done
+            Skip    s' -> Skip (skip :*: s')
+            Yield t s' ->
+                case t of
+                    B '\0'     -> Skip    (False :*: s')
+                    B _ | skip -> Skip    (False :*: s')
+                    B c        -> Yield c (False :*: s')
+                    _   | skip -> Skip    (skip  :*: s')
+                    U c        -> Yield c (skip  :*: s')
+                    L c        -> Yield c (skip  :*: s')
+{-# INLINE [0] dropWord #-}
 
-                b = isBoundary c
-                u = Char.isUpper c
-{-# INLINE takeWord #-}
-
--- take :: Integral a => a -> Stream Char -> Stream Char
--- take n0 (Stream next0 s0 len) =
---     Stream next (n0 :*: s0) (smaller len (fromIntegral (max 0 n0)))
---   where
---     next (n :*: s)
---         | n <= 0    = Done
---         | otherwise = case next0 s of
---             Done -> Done
---             Skip s' -> Skip (n :*: s')
---             Yield x s' -> Yield x ((n-1) :*: s')
-
--- stripWord :: Stream Char -> Maybe (Stream Char)
--- stripWord (Stream next0 s0 len) = go
---   where
---     next !s = case next0 s of
---         Done    -> Nothing
---         Skip s' -> next s
---         Yield c s'
---             | isBoundary c -> Just (Stream next s' len)
---             | otherwise    -> 
-
--- drop :: Integral a => a -> Stream Char -> Stream Char
--- drop n0 (Stream next0 s0 len) =
---     Stream next (J n0 :*: s0) (len - fromIntegral (max 0 n0))
---   where
---     {-# INLINE next #-}
---     next (J n :*: s)
---       | n <= 0    = Skip (N :*: s)
---       | otherwise = case next0 s of
---           Done       -> Done
---           Skip    s' -> Skip (J n    :*: s')
---           Yield _ s' -> Skip (J (n-1) :*: s')
---     next (N :*: s) = case next0 s of
---       Done       -> Done
---       Skip    s' -> Skip    (N :*: s')
---       Yield x s' -> Yield x (N :*: s')
--- {-# INLINE [0] drop #-}
-
--- uncons (Stream next s0 len) = loop_uncons s0
---     where
---       loop_uncons !s = case next s of
---                          Yield x s1 -> Just (x, Stream next s1 (len-1))
---                          Skip s'    -> loop_uncons s'
---                          Done       -> Nothing
--- {-# INLINE stripWord #-}
-
-
-lowerFirst :: Stream Char -> Stream Char
-lowerFirst = first toLower
-{-# INLINE lowerFirst #-}
-
-upperFirst :: Stream Char -> Stream Char
-upperFirst = first toUpper
-{-# INLINE upperFirst #-}
+toTitle :: Stream Char -> Stream Char
+toTitle = mapHead toUpper . transformWith (yield ' ') yield lower . tokenise
+{-# INLINE [0] toTitle #-}
 
 toCamel :: Stream Char -> Stream Char
-toCamel = lowerFirst . normalise isBoundary
-{-# INLINE toCamel #-}
+toCamel = mapHead toLower . transformWith skip' upper lower . tokenise
+{-# INLINE [0] toCamel #-}
 
 toPascal :: Stream Char -> Stream Char
-toPascal = upperFirst . normalise isBoundary
-{-# INLINE toPascal #-}
+toPascal = mapHead toUpper . transformWith skip' upper lower . tokenise
+{-# INLINE [0] toPascal #-}
 
 toSnake :: Stream Char -> Stream Char
-toSnake = transform isBoundary lowerMapping '_'
-{-# INLINE toSnake #-}
+toSnake = transform (yield '_') lower . tokenise
+{-# INLINE [0] toSnake #-}
 
 toSpinal :: Stream Char -> Stream Char
-toSpinal = transform isBoundary lowerMapping '-'
-{-# INLINE toSpinal #-}
+toSpinal = transform (yield '-') lower . tokenise
+{-# INLINE [0] toSpinal #-}
 
 toTrain :: Stream Char -> Stream Char
-toTrain = transform isBoundary titleMapping '-'
-{-# INLINE toTrain #-}
-
-toHuman :: Stream Char -> Stream Char
-toHuman = upperFirst . transform isBoundary lowerMapping ' '
-{-# INLINE toHuman #-}
+toTrain = mapHead toUpper . transformWith (yield '-') upper lower . tokenise
+{-# INLINE [0] toTrain #-}
 
 strict :: (Stream Char -> Stream Char) -> Text -> Text
 strict f t = Fusion.unstream (f (Fusion.stream t))
-{-# INLINE strict #-}
+{-# INLINE [0] strict #-}
 
 lazy :: (Stream Char -> Stream Char) -> LText.Text -> LText.Text
 lazy f t = LFusion.unstream (f (LFusion.stream t))
-{-# INLINE lazy #-}
+{-# INLINE [0] lazy #-}
 
--- | Remove word boundaries and uppercase any subsequent valid characters.
-normalise :: (Char -> Bool) -- ^ Boundary predicate
+skip' :: forall s. s -> Step (CC s) Char
+skip' s = Skip (CC s '\0' '\0')
+
+yield, upper, lower :: forall s. Char -> s -> Step (CC s) Char
+yield !c s = Yield c (CC s '\0' '\0')
+upper !c s = upperMapping c s
+lower !c s = lowerMapping c s
+
+-- | Step across word boundaries using a custom action, and transform
+-- both subsequent uppercase and lowercase characters uniformly.
+--
+-- /See:/ 'transformWith'
+transform :: (forall s. s -> Step (CC s) Char)         -- ^ Boundary action.
+          -> (forall s. Char -> s -> Step (CC s) Char) -- ^ Character mapping.
+          -> Stream Token                              -- ^ Input stream.
           -> Stream Char
-          -> Stream Char
-normalise f (Stream next0 s0 len) =
-    Stream next (CC (False :*: s0) '\0' '\0') len
+transform s m = transformWith s m m
+{-# INLINE [0] transform #-}
+
+-- | Step across word boundaries using a custom action, and transform
+-- subsequent characters after the word boundary is encountered with a mapping
+-- depending on case.
+transformWith :: (forall s. s -> Step (CC s) Char)         -- ^ Boundary action.
+              -> (forall s. Char -> s -> Step (CC s) Char) -- ^ Boundary mapping.
+              -> (forall s. Char -> s -> Step (CC s) Char) -- ^ Subsequent character mapping.
+              -> Stream Token                              -- ^ Input stream.
+              -> Stream Char
+transformWith md mu mc (Stream next0 s0 len) =
+    -- HINT: len incorrect when the boundary replacement yields a char.
+    Stream next (CC (False :*: False :*: s0) '\0' '\0') len
   where
-    next (CC (bdry :*: s) '\0' _) =
+    next (CC (up :*: prev :*: s) '\0' _) =
         case next0 s of
-            Done            -> Done
-            Skip s'         -> Skip    (CC (bdry :*: s') '\0' '\0')
-            Yield c s'
-                | b         -> Skip    (CC    (b :*: s') '\0' '\0')
-                | bdry      -> upperMapping c (b :*: s')
-                | otherwise -> Yield c (CC    (b :*: s') '\0' '\0')
-              where
-                b = f c
+            Done       -> Done
+            Skip    s' -> Skip (CC (up :*: prev :*: s') '\0' '\0')
+            Yield t s' ->
+                case t of
+                    B  _        -> md   (False :*: True  :*: s')
+                    U  c | prev -> mu c (True  :*: False :*: s')
+                    L  c | prev -> mu c (False :*: False :*: s')
+                    U  c | up   -> mu c (True  :*: False :*: s')
+                    U  c        -> mc c (True  :*: False :*: s')
+                    L  c        -> mc c (False :*: False :*: s')
 
     next (CC s a b) = Yield a (CC s b '\0')
-{-# INLINE normalise #-}
+{-# INLINE [0] transformWith #-}
 
--- | This is simply a replica of 'CC' from 'Data.Text.Internal.Fusion.Types'
--- which has an extra slot for the delimiter.
-data T s = T !s {-# UNPACK #-} !Char {-# UNPACK #-} !Char {-# UNPACK #-} !Char
+-- | A token representing characters and boundaries in a stream.
+data Token
+    = B  {-# UNPACK #-} !Char -- ^ Word boundary.
+    | U  {-# UNPACK #-} !Char -- ^ Upper case character.
+    | L  {-# UNPACK #-} !Char -- ^ Lower case character.
+      deriving (Show)
 
--- | Replace word boundaries with a specific delimiter, and transform
--- any subsequent valid characters after the word boundary is encountered.
-transform :: (Char -> Bool)                            -- ^ Boundary predicate
-          -> (forall s. Char -> s -> Step (CC s) Char) -- ^ Char mapping
-          -> Char                                      -- ^ Delimiter
-          -> Stream Char
-          -> Stream Char
-transform f m !d (Stream next0 s0 len) =
-    Stream next (T (s0 :*: True :*: False :*: False) '\0' '\0' '\0') len
+-- | Tokenise a character stream using the default 'isBoundary' predicate.
+--
+-- /See:/ 'tokeniseWith'
+tokenise :: Stream Char -- ^ Input stream.
+         -> Stream Token
+tokenise = tokeniseWith isBoundary
+{-# INLINE [0] tokenise #-}
+
+-- | Tokenise a character stream using a custom boundary predicate.
+tokeniseWith :: (Char -> Bool) -- ^ Boundary predicate.
+             -> Stream Char    -- ^ Input stream.
+             -> Stream Token
+tokeniseWith f (Stream next0 s0 len) =
+    -- HINT: len incorrect if there are adjacent boundaries, which are skipped.
+    Stream next (CC (True :*: False :*: False :*: s0) '\0' '\0') len
   where
-    next (T (s :*: start :*: upper :*: bdry) '\0' '\0' _) =
+    next (CC (start :*: up :*: prev :*: s) '\0' _) =
         case next0 s of
-            Done                   -> Done
-            Skip s'                -> Skip (step s' upper bdry)
+            Done               -> Done
+            Skip    s'         -> Skip (CC (start :*: up :*: prev :*: s') '\0' '\0')
             Yield c s'
-                | start            -> push False s' c u b
-                | b, bdry          -> Skip (step s' u b)
-                | bdry             -> push False s' c u b
-                | b                -> Yield d (step s' u b)
-                | u, bdry || start -> push False s' c u b
-                | u, upper         -> push False s' c u b
-                | u                -> push True  s' c u b
-                | otherwise        -> Yield c (step s' u b)
+                | not b, start -> push
+                | up           -> push
+                | b, prev      -> Skip (step start)
+                | otherwise    -> push
               where
+                push | b         = Yield (B c)    (step False)
+                     | u, skip   = Yield (U c)    (step False)
+                     | u         = Yield (B '\0') (CC (False :*: u :*: b :*: s') c '\0')
+                     | otherwise = Yield (L c)    (step False)
+
+                step p = CC (p :*: u :*: b :*: s') '\0' '\0'
+
+                skip = up || start || prev
+
                 b = f c
                 u = Char.isUpper c
 
-    next (T s a b c) = Yield a (T s b c '\0')
+    next (CC s a b) = Yield (U a) (CC s b '\0')
+{-# INLINE [0] tokeniseWith #-}
 
-    step s upper bdry = T (s :*: False :*: upper :*: bdry) '\0' '\0' '\0'
-
-    push delim s c upper bdry =
-        case m c (s :*: False :*: upper :*: bdry) of
-            Yield x (CC s' y z)
-                | delim     -> Yield d (T s' x y z)
-                | otherwise -> Yield x (T s' y z '\0')
-            _               -> Yield c (step s upper bdry)
-{-# INLINE transform #-}
-
-isBoundary :: Char -> Bool
-isBoundary c = Char.isSpace c || c == '-' || c == '_'
-{-# INLINE isBoundary #-}
-
-first :: (Stream Char -> Stream Char) -> Stream Char -> Stream Char
-first f s = maybe s (\(x, s') -> f (singleton x) `append` s') (uncons s)
-{-# INLINE first #-}
+mapHead :: (Stream Char -> Stream Char) -> Stream Char -> Stream Char
+mapHead f s = maybe s (\(x, s') -> f (singleton x) `append` s') (uncons s)
+{-# INLINE [0] mapHead #-}
