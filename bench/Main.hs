@@ -1,6 +1,4 @@
-{-# LANGUAGE BangPatterns      #-}
 {-# LANGUAGE OverloadedStrings #-}
-
 
 -- Module      : Main
 -- Copyright   : (c) 2014 Brendan Hay <brendan.g.hay@gmail.com>
