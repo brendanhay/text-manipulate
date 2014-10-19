@@ -10,7 +10,7 @@ window.onload = function () {pageLoad();setSynopsis("mini_Data-Text-Lazy-Case.ht
  functions are provided by the <a href="Data-Text-Lazy-Case.html">Data.Text.Lazy.Case</a> module.</p></div><h1 id="g:2">Unicode</h1><div class="doc"><p>While this library to support Unicode in a similar fashion to the
  underlying <a href="http://hackage.haskell.org/package/text">text</a> library,
  more Unicode specific handling of word boundaries can be found in the
- <a href="http://hackage.haskell.org/package/text-icu">text-icu</a> library.</p></div><h1 id="g:3">Fusion</h1><div class="doc"><p>Alot of the functions in this module are subject to fusion, meaning that
+ <a href="http://hackage.haskell.org/package/text-icu">text-icu</a> library.</p></div><h1 id="g:3">Fusion</h1><div class="doc"><p>Many functions in this module are subject to fusion, meaning that
  a pipeline of such functions will usually allocate at most one Text value.</p><p>Functions that can be fused by the compiler are documented with the
  phrase <em>Subject to fusion</em>.</p></div><h1 id="g:4">Character manipulation</h1><div class="top"><p class="src"><a name="v:lowerHead" class="def">lowerHead</a> :: Text -&gt; Text</p><div class="doc"><p>Lowercase the first character of a piece of text.</p><pre class="screen"><code class="prompt">&gt;&gt;&gt; </code><strong class="userinput"><code>lowerHead &quot;Title Cased&quot;
 </code></strong>&quot;title Cased&quot;
