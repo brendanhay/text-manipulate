@@ -29,6 +29,15 @@
     -- * Fusion
     -- $fusion
 
+    -- * Subwords
+    -- ** Removing words
+    , takeWord
+    , dropWord
+    , stripWord
+    -- ** Breaking on words
+    , breakWord
+    , splitWords
+
     -- * Character manipulation
       lowerHead
     , upperHead
@@ -39,15 +48,6 @@
     -- * Line manipulation
     , indentLines
     , prependLines
-
-    -- * Subwords
-    -- ** Removing words
-    , takeWord
-    , dropWord
-    , stripWord
-    -- ** Breaking on words
-    , breakWord
-    , splitWords
 
     -- * Acronyms
     , toAcronym
