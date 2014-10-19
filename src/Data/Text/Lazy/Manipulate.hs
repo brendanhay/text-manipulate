@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ViewPatterns      #-}
 
--- Module      : Data.Text.Case
+-- Module      : Data.Text.Lazy.Manipulate
 -- Copyright   : (c) 2014 Brendan Hay <brendan.g.hay@gmail.com>
 -- License     : This Source Code Form is subject to the terms of
 --               the Mozilla Public License, v. 2.0.
@@ -11,14 +11,14 @@
 -- Stability   : experimental
 -- Portability : non-portable (GHC extensions)
 
--- | Manipulate programmatic identifiers and structurally non-complex pieces
+-- | Manipulate identifiers and structurally non-complex pieces
 -- of text by delimiting word boundaries via a combination of whitespace,
 -- control-characters, and case-sensitivity.
 --
 -- Assumptions have been made about word boundary characteristics inherint
 -- in predominantely English text, please see individual function documentation
 -- for further details and behaviour.
- module Data.Text.Case
+module Data.Text.Lazy.Manipulate
     (
     -- * Strict vs lazy types
     -- $strict
@@ -29,25 +29,23 @@
     -- * Fusion
     -- $fusion
 
-    -- * Character manipulation
-      lowerHead
-    , upperHead
-    , mapHead
-    , isBoundary
-    , isWordBoundary
-
-    -- * Line manpipulation
-    , indentLines
-    , prependLines
-
     -- * Subwords
     -- ** Removing words
-    , takeWord
+      takeWord
     , dropWord
     , stripWord
     -- ** Breaking on words
     , breakWord
     , splitWords
+
+    -- * Character manipulation
+    , lowerHead
+    , upperHead
+    , mapHead
+
+    -- * Line manipulation
+    , indentLines
+    , prependLines
 
     -- * Acronyms
     , toAcronym
@@ -63,44 +61,40 @@
     , toSnake
     , toSpinal
     , toTrain
+
+    -- * Boundary predicates
+    , isBoundary
+    , isWordBoundary
     ) where
 
-import qualified Data.Char             as Char
-import           Data.List             (intersperse)
+import qualified Data.Char              as Char
+import           Data.List              (intersperse)
 import           Data.Monoid
-import           Data.Text             (Text)
-import qualified Data.Text             as Text
-import           Data.Text.Case.Fusion (strict)
-import qualified Data.Text.Case.Fusion as Fusion
-import           Data.Text.Case.Types
-import qualified Data.Text.Lazy        as LText
-import qualified Data.Text.Lazy.Case   as LCase
+import           Data.Text.Buildable
+import           Data.Text.Manipulate.Fusion  (lazy)
+import qualified Data.Text.Manipulate.Fusion  as Fusion
+import           Data.Text.Manipulate.Types
+import           Data.Text.Lazy         (Text)
+import qualified Data.Text.Lazy         as LText
+import           Data.Text.Lazy.Builder (toLazyText)
 
 -- $strict
 -- This library provides functions for manipulating both strict and lazy Text types.
--- The strict type is provided by the "Data.Text.Case" module, while the lazy
--- type is provided by the "Data.Text.Lazy.Case" module.
+-- The strict functions are provided by the "Data.Text.Manipulate" module, while the lazy
+-- functions are provided by the "Data.Text.Lazy.Manipulate" module.
 
 -- $unicode
--- While this library to support Unicode in a similar fashion to the
+-- While this library supports Unicode in a similar fashion to the
 -- underlying <http://hackage.haskell.org/package/text text> library,
 -- more Unicode specific handling of word boundaries can be found in the
 -- <http://hackage.haskell.org/package/text-icu text-icu> library.
 
 -- $fusion
--- Alot of the functions in this module are subject to fusion, meaning that
+-- Many functions in this module are subject to fusion, meaning that
 -- a pipeline of such functions will usually allocate at most one Text value.
 --
 -- Functions that can be fused by the compiler are documented with the
 -- phrase /Subject to fusion/.
-
--- DEBUG:
--- import Data.Text.Internal.Fusion        (stream)
--- import Data.Text.Internal.Fusion.Common (unstreamList)
--- tokens = unstreamList . Fusion.tokenise . stream
-
--- FIXME:
--- dropWord "ALong" == ""
 
 -- | Lowercase the first character of a piece of text.
 --
@@ -119,27 +113,27 @@ upperHead = mapHead Char.toUpper
 -- | Apply a function to the first character of a piece of text.
 mapHead :: (Char -> Char) -> Text -> Text
 mapHead f x =
-    case Text.uncons x of
-        Just (c, cs) -> Text.singleton (f c) <> cs
+    case LText.uncons x of
+        Just (c, cs) -> LText.singleton (f c) <> cs
         Nothing      -> x
 
 -- | Indent newlines by the given number of spaces.
 indentLines :: Int -> Text -> Text
-indentLines n = prependLines (Text.replicate n " ")
+indentLines n = prependLines (LText.replicate (fromIntegral n) " ")
 
 -- | Prepend newlines with the given separator
 prependLines :: Text -> Text -> Text
-prependLines sep = mappend sep . Text.unlines . intersperse sep . Text.lines
+prependLines sep = mappend sep . LText.unlines . intersperse sep . LText.lines
 
 -- | O(n) Returns the first word, or the original text if no word
 -- boundary is encountered. /Subject to fusion./
 takeWord :: Text -> Text
-takeWord = strict Fusion.takeWord
+takeWord = lazy Fusion.takeWord
 
 -- | O(n) Return the suffix after dropping the first word. If no word
 -- boundary is encountered, the result will be empty. /Subject to fusion./
 dropWord :: Text -> Text
-dropWord = strict Fusion.dropWord
+dropWord = lazy Fusion.dropWord
 
 -- | Break a piece of text after the first word boundary is encountered.
 --
@@ -161,8 +155,8 @@ breakWord x = (takeWord x, dropWord x)
 -- Nothing
 stripWord :: Text -> Maybe Text
 stripWord x
-    | Text.length y < Text.length x = Just y
-    | otherwise                     = Nothing
+    | LText.length y < LText.length x = Just y
+    | otherwise                       = Nothing
   where
     y = dropWord x
 
@@ -174,9 +168,9 @@ splitWords :: Text -> [Text]
 splitWords = go
   where
     go x = case breakWord x of
-        (h, t) | Text.null h -> go t
-               | Text.null t -> [h]
-               | otherwise   -> h : go t
+        (h, t) | LText.null h -> go t
+               | LText.null t -> [h]
+               | otherwise    -> h : go t
 
 -- | O(n) Create an adhoc acronym from a piece of cased text.
 --
@@ -189,11 +183,11 @@ splitWords = go
 -- >>> toAcronym "this_is_all_lowercase"
 -- Nothing
 toAcronym :: Text -> Maybe Text
-toAcronym (Text.filter Char.isUpper -> x)
-    | Text.length x > 1 = Just x
-    | otherwise         = Nothing
+toAcronym (LText.filter Char.isUpper -> x)
+    | LText.length x > 1 = Just x
+    | otherwise          = Nothing
 
--- | Build an ordinal used to denote the position in an ordered sequence.
+-- | Render an ordinal used to denote the position in an ordered sequence.
 -- @toOrdinal == build . Ordinal@.
 --
 -- >>> toOrdinal (101 :: Int)
@@ -202,28 +196,28 @@ toAcronym (Text.filter Char.isUpper -> x)
 -- >>> toOrdinal (12 :: Int)
 -- "12th"
 toOrdinal :: Integral a => a -> Text
-toOrdinal = LText.toStrict . LCase.toOrdinal
+toOrdinal = toLazyText . build . Ordinal
 
--- | O(n) Convert casing to @Titled Cased Phrase@. /Subject to fusion./
+-- | O(n) Convert casing to @Title Cased Phrase@. /Subject to fusion./
 toTitle :: Text -> Text
-toTitle = strict Fusion.toTitle
+toTitle = lazy Fusion.toTitle
 
 -- | O(n) Convert casing to @camelCasedPhrase@. /Subject to fusion./
 toCamel :: Text -> Text
-toCamel = strict Fusion.toCamel
+toCamel = lazy Fusion.toCamel
 
 -- | O(n) Convert casing to @PascalCasePhrase@. /Subject to fusion./
 toPascal :: Text -> Text
-toPascal = strict Fusion.toPascal
+toPascal = lazy Fusion.toPascal
 
 -- | O(n) Convert casing to @snake_cased_phrase@. /Subject to fusion./
 toSnake :: Text -> Text
-toSnake = strict Fusion.toSnake
+toSnake = lazy Fusion.toSnake
 
 -- | O(n) Convert casing to @spinal-cased-phrase@. /Subject to fusion./
 toSpinal :: Text -> Text
-toSpinal = strict Fusion.toSpinal
+toSpinal = lazy Fusion.toSpinal
 
 -- | O(n) Convert casing to @Train-Cased-Phrase@. /Subject to fusion./
 toTrain :: Text -> Text
-toTrain = strict Fusion.toTrain
+toTrain = lazy Fusion.toTrain
