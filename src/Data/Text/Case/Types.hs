@@ -31,8 +31,10 @@ instance Integral a => Buildable (Ordinal a) where
 
         (flip mod 100 -> x, flip mod 10 -> y) = join (,) (abs n)
 
-isBoundary :: Char -> Bool
-isBoundary c = Char.isSpace c || c == '-' || c == '_'
-
+-- | Returns 'True' for any boundary or uppercase character.
 isWordBoundary :: Char -> Bool
 isWordBoundary c = isBoundary c || Char.isUpper c
+
+-- | Returns 'True' for any boundary character.
+isBoundary :: Char -> Bool
+isBoundary c = Char.isSpace c || c == '-' || c == '_'
