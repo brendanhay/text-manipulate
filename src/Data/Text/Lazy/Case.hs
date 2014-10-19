@@ -185,7 +185,7 @@ toAcronym (LText.filter Char.isUpper -> x)
     | LText.length x > 1 = Just x
     | otherwise          = Nothing
 
--- | Build an ordinal used to denote the position in an ordered sequence.
+-- | Render an ordinal used to denote the position in an ordered sequence.
 -- @toOrdinal == build . Ordinal@.
 --
 -- >>> toOrdinal (101 :: Int)
