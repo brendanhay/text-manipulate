@@ -82,7 +82,7 @@ import qualified Data.Text.Lazy.Case   as LCase
 -- functions are provided by the "Data.Text.Lazy.Case" module.
 
 -- $unicode
--- While this library to support Unicode in a similar fashion to the
+-- While this library supports Unicode in a similar fashion to the
 -- underlying <http://hackage.haskell.org/package/text text> library,
 -- more Unicode specific handling of word boundaries can be found in the
 -- <http://hackage.haskell.org/package/text-icu text-icu> library.
