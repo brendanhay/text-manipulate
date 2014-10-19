@@ -33,8 +33,8 @@ instance Integral a => Buildable (Ordinal a) where
 
 -- | Returns 'True' for any boundary or uppercase character.
 isWordBoundary :: Char -> Bool
-isWordBoundary c = isBoundary c || Char.isUpper c
+isWordBoundary c = Char.isUpper c || isBoundary c
 
 -- | Returns 'True' for any boundary character.
 isBoundary :: Char -> Bool
-isBoundary c = Char.isSpace c || c == '-' || c == '_'
+isBoundary = not . Char.isAlphaNum

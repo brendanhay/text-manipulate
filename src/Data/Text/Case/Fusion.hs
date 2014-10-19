@@ -46,7 +46,7 @@ dropWord (tokenise -> Stream next0 s0 len) = Stream next (True :*: s0) len
 {-# INLINE [0] dropWord #-}
 
 toTitle :: Stream Char -> Stream Char
-toTitle = mapHead toUpper . transformWith (yield ' ') yield lower . tokenise
+toTitle = mapHead toUpper . transformWith (yield ' ') upper lower . tokenise
 {-# INLINE [0] toTitle #-}
 
 toCamel :: Stream Char -> Stream Char
