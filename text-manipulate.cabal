@@ -1,5 +1,5 @@
 name:                  text-manipulate
-version:               0.1.0
+version:               0.1.1
 synopsis:              Case conversion, word boundary manipulation, and miscellanous textual subjugation.
 homepage:              https://github.com/brendanhay/text-manipulate
 license:               OtherLicense
@@ -7,7 +7,7 @@ license-file:          LICENSE
 author:                Brendan Hay
 maintainer:            brendan.g.hay@gmail.com
 copyright:             Copyright (c) 2014 Brendan Hay
-category:              Data
+category:              Data, Text
 build-type:            Simple
 extra-source-files:    README.md
 cabal-version:         >= 1.10
@@ -20,6 +20,11 @@ description:
     Has support for common idioms like casing of programmatic variable names,
     taking, dropping, and splitting by word, and modifying the first character
     of a piece of text.
+    .
+    /Caution:/ this library makes heavy use of the <http://hackage.haskell.org/package/text text>
+    library's internal loop optimisation framework. Since internal modules are not
+    guaranteed to have a stable API there is potential for build breakage when
+    the text dependency is upgraded. Consider yourself warned!
 
 source-repository head
     type:     git
