@@ -36,7 +36,7 @@ module Data.Text.Lazy.Case
     , isBoundary
     , isWordBoundary
 
-    -- * Line manpipulation
+    -- * Line manipulation
     , indentLines
     , prependLines
 
