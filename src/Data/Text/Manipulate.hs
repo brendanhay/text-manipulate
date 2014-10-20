@@ -86,7 +86,7 @@ import           Data.Text.Manipulate.Internal.Types
 -- $unicode
 -- While this library supports Unicode in a similar fashion to the
 -- underlying <http://hackage.haskell.org/package/text text> library,
--- more Unicode specific handling of word boundaries can be found in the
+-- more explicit Unicode handling of word boundaries can be found in the
 -- <http://hackage.haskell.org/package/text-icu text-icu> library.
 
 -- $fusion
