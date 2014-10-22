@@ -84,8 +84,8 @@ import           Data.Text.Manipulate.Internal.Types
 
 -- $strict
 -- This library provides functions for manipulating both strict and lazy Text types.
--- The strict functions are provided by the "Data.Text.Case" module, while the lazy
--- functions are provided by the "Data.Text.Lazy.Case" module.
+-- The strict functions are provided by the "Data.Text.Manipulate" module, while the lazy
+-- functions are provided by the "Data.Text.Lazy.Manipulate" module.
 
 -- $unicode
 -- While this library supports Unicode in a similar fashion to the
