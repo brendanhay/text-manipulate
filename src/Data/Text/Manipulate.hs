@@ -47,6 +47,10 @@
     , indentLines
     , prependLines
 
+    -- * Ellipsis
+    , toEllipsis
+    , toEllipsisWith
+
     -- * Acronyms
     , toAcronym
 
@@ -67,16 +71,16 @@
     , isWordBoundary
     ) where
 
-import qualified Data.Char                   as Char
-import           Data.List                   (intersperse)
+import qualified Data.Char                            as Char
+import           Data.List                            (intersperse)
 import           Data.Monoid
-import           Data.Text                   (Text)
-import qualified Data.Text                   as Text
-import qualified Data.Text.Lazy              as LText
-import qualified Data.Text.Lazy.Manipulate   as LMan
-import           Data.Text.Manipulate.Fusion (strict)
-import qualified Data.Text.Manipulate.Fusion as Fusion
-import           Data.Text.Manipulate.Types
+import           Data.Text                            (Text)
+import qualified Data.Text                            as Text
+import qualified Data.Text.Lazy                       as LText
+import qualified Data.Text.Lazy.Manipulate            as LMan
+import           Data.Text.Manipulate.Internal.Fusion (strict)
+import qualified Data.Text.Manipulate.Internal.Fusion as Fusion
+import           Data.Text.Manipulate.Internal.Types
 
 -- $strict
 -- This library provides functions for manipulating both strict and lazy Text types.
@@ -86,7 +90,7 @@ import           Data.Text.Manipulate.Types
 -- $unicode
 -- While this library supports Unicode in a similar fashion to the
 -- underlying <http://hackage.haskell.org/package/text text> library,
--- more Unicode specific handling of word boundaries can be found in the
+-- more explicit Unicode handling of word boundaries can be found in the
 -- <http://hackage.haskell.org/package/text-icu text-icu> library.
 
 -- $fusion
@@ -126,12 +130,31 @@ mapHead f x =
         Nothing      -> x
 
 -- | Indent newlines by the given number of spaces.
+--
+-- /See:/ 'prependLines'
 indentLines :: Int -> Text -> Text
 indentLines n = prependLines (Text.replicate n " ")
 
 -- | Prepend newlines with the given separator
 prependLines :: Text -> Text -> Text
 prependLines sep = mappend sep . Text.unlines . intersperse sep . Text.lines
+
+-- | O(n) Truncate text to a specific length.
+-- If the text was truncated the ellipsis sign "..." will be appended.
+--
+-- /See:/ 'toEllipsisWith'
+toEllipsis :: Int -> Text -> Text
+toEllipsis n = toEllipsisWith n "..."
+
+-- | O(n) Truncate text to a specific length.
+-- If the text was truncated the given ellipsis sign will be appended.
+toEllipsisWith :: Int  -- ^ Length.
+               -> Text -- ^ Ellipsis.
+               -> Text
+               -> Text
+toEllipsisWith n suf x
+    | Text.length x > n = Text.take n x <> suf
+    | otherwise         = x
 
 -- | O(n) Returns the first word, or the original text if no word
 -- boundary is encountered. /Subject to fusion./

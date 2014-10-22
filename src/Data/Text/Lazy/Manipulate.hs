@@ -47,6 +47,10 @@ module Data.Text.Lazy.Manipulate
     , indentLines
     , prependLines
 
+    -- * Ellipsis
+    , toEllipsis
+    , toEllipsisWith
+
     -- * Acronyms
     , toAcronym
 
@@ -67,16 +71,17 @@ module Data.Text.Lazy.Manipulate
     , isWordBoundary
     ) where
 
-import qualified Data.Char              as Char
-import           Data.List              (intersperse)
+import qualified Data.Char                            as Char
+import           Data.Int
+import           Data.List                            (intersperse)
 import           Data.Monoid
 import           Data.Text.Buildable
-import           Data.Text.Manipulate.Fusion  (lazy)
-import qualified Data.Text.Manipulate.Fusion  as Fusion
-import           Data.Text.Manipulate.Types
-import           Data.Text.Lazy         (Text)
-import qualified Data.Text.Lazy         as LText
-import           Data.Text.Lazy.Builder (toLazyText)
+import           Data.Text.Lazy                       (Text)
+import qualified Data.Text.Lazy                       as LText
+import           Data.Text.Lazy.Builder               (toLazyText)
+import           Data.Text.Manipulate.Internal.Fusion (lazy)
+import qualified Data.Text.Manipulate.Internal.Fusion as Fusion
+import           Data.Text.Manipulate.Internal.Types
 
 -- $strict
 -- This library provides functions for manipulating both strict and lazy Text types.
@@ -124,6 +129,23 @@ indentLines n = prependLines (LText.replicate (fromIntegral n) " ")
 -- | Prepend newlines with the given separator
 prependLines :: Text -> Text -> Text
 prependLines sep = mappend sep . LText.unlines . intersperse sep . LText.lines
+
+-- | O(n) Truncate text to a specific length.
+-- If the text was truncated the ellipsis sign "..." will be appended.
+--
+-- /See:/ 'toEllipsisWith'
+toEllipsis :: Int64 -> Text -> Text
+toEllipsis n = toEllipsisWith n "..."
+
+-- | O(n) Truncate text to a specific length.
+-- If the text was truncated the given ellipsis sign will be appended.
+toEllipsisWith :: Int64 -- ^ Length.
+               -> Text  -- ^ Ellipsis.
+               -> Text
+               -> Text
+toEllipsisWith n suf x
+    | LText.length x > n = LText.take n x <> suf
+    | otherwise          = x
 
 -- | O(n) Returns the first word, or the original text if no word
 -- boundary is encountered. /Subject to fusion./
