@@ -47,6 +47,10 @@
     , indentLines
     , prependLines
 
+    -- * Ellipsis
+    , toEllipsis
+    , toEllipsisWith
+
     -- * Acronyms
     , toAcronym
 
@@ -126,12 +130,31 @@ mapHead f x =
         Nothing      -> x
 
 -- | Indent newlines by the given number of spaces.
+--
+-- /See:/ 'prependLines'
 indentLines :: Int -> Text -> Text
 indentLines n = prependLines (Text.replicate n " ")
 
 -- | Prepend newlines with the given separator
 prependLines :: Text -> Text -> Text
 prependLines sep = mappend sep . Text.unlines . intersperse sep . Text.lines
+
+-- | O(n) Truncate text to a specific length.
+-- If the text was truncated the ellipsis sign "..." will be appended.
+--
+-- /See:/ 'toEllipsisWith'
+toEllipsis :: Int -> Text -> Text
+toEllipsis n = toEllipsisWith n "..."
+
+-- | O(n) Truncate text to a specific length.
+-- If the text was truncated the given ellipsis sign will be appended.
+toEllipsisWith :: Int  -- ^ Length.
+               -> Text -- ^ Ellipsis.
+               -> Text
+               -> Text
+toEllipsisWith n suf x
+    | Text.length x > n = Text.take n x <> suf
+    | otherwise         = x
 
 -- | O(n) Returns the first word, or the original text if no word
 -- boundary is encountered. /Subject to fusion./

@@ -47,6 +47,10 @@ module Data.Text.Lazy.Manipulate
     , indentLines
     , prependLines
 
+    -- * Ellipsis
+    , toEllipsis
+    , toEllipsisWith
+
     -- * Acronyms
     , toAcronym
 
@@ -67,8 +71,8 @@ module Data.Text.Lazy.Manipulate
     , isWordBoundary
     ) where
 
-
 import qualified Data.Char                            as Char
+import           Data.Int
 import           Data.List                            (intersperse)
 import           Data.Monoid
 import           Data.Text.Buildable
@@ -125,6 +129,23 @@ indentLines n = prependLines (LText.replicate (fromIntegral n) " ")
 -- | Prepend newlines with the given separator
 prependLines :: Text -> Text -> Text
 prependLines sep = mappend sep . LText.unlines . intersperse sep . LText.lines
+
+-- | O(n) Truncate text to a specific length.
+-- If the text was truncated the ellipsis sign "..." will be appended.
+--
+-- /See:/ 'toEllipsisWith'
+toEllipsis :: Int64 -> Text -> Text
+toEllipsis n = toEllipsisWith n "..."
+
+-- | O(n) Truncate text to a specific length.
+-- If the text was truncated the given ellipsis sign will be appended.
+toEllipsisWith :: Int64 -- ^ Length.
+               -> Text  -- ^ Ellipsis.
+               -> Text
+               -> Text
+toEllipsisWith n suf x
+    | LText.length x > n = LText.take n x <> suf
+    | otherwise          = x
 
 -- | O(n) Returns the first word, or the original text if no word
 -- boundary is encountered. /Subject to fusion./
