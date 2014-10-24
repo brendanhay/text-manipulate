@@ -5,7 +5,7 @@ homepage:              https://github.com/brendanhay/text-manipulate
 license:               OtherLicense
 license-file:          LICENSE
 author:                Brendan Hay
-maintainer:            brendan.g.hay@gmail.com
+maintainer:            Brendan Hay <brendan.g.hay@gmail.com>
 copyright:             Copyright (c) 2014 Brendan Hay
 category:              Data, Text
 build-type:            Simple
