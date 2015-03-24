@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 
@@ -14,10 +14,10 @@
 
 module Main (main) where
 
-import Data.Text        (Text)
-import Data.Text.Case
-import Test.Tasty
-import Test.Tasty.HUnit
+import           Data.Text            (Text)
+import           Data.Text.Manipulate
+import           Test.Tasty
+import           Test.Tasty.HUnit
 
 main :: IO ()
 main = defaultMain $ testGroup "tests"
@@ -206,7 +206,7 @@ main = defaultMain $ testGroup "tests"
         , "1 Mixed String AOK"
         , "A Double Stop Phrase"
         , "HTML5"
-        , "ΕίναιΥπάρχουν πολλές Αντίθετα"
+        , "Είναι Υπάρχουν Πολλές Αντίθετα"
         , "Je Obecně Úvodní Španěl"
         ]
     ]
@@ -214,7 +214,7 @@ main = defaultMain $ testGroup "tests"
 exampleGroup :: (Show a, Eq a) => TestName -> (Text -> a) -> [a] -> TestTree
 exampleGroup n f = testGroup n . zipWith run reference
   where
-    run (c, x) y = testCase c (y @=? f x)
+    run (c, x) y = testCase c (f x @=? y)
 
     reference =
         [ ("Empty",       "")
