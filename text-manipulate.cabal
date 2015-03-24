@@ -1,12 +1,12 @@
 name:                  text-manipulate
-version:               0.1.2.1
+version:               0.1.3
 synopsis:              Case conversion, word boundary manipulation, and textual subjugation.
 homepage:              https://github.com/brendanhay/text-manipulate
 license:               OtherLicense
 license-file:          LICENSE
 author:                Brendan Hay
-maintainer:            brendan.g.hay@gmail.com
-copyright:             Copyright (c) 2014 Brendan Hay
+maintainer:            Brendan Hay <brendan.g.hay@gmail.com>
+copyright:             Copyright (c) 2014-2015 Brendan Hay
 category:              Data, Text
 build-type:            Simple
 extra-source-files:    README.md

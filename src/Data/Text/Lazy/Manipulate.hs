@@ -2,7 +2,7 @@
 {-# LANGUAGE ViewPatterns      #-}
 
 -- Module      : Data.Text.Lazy.Manipulate
--- Copyright   : (c) 2014 Brendan Hay <brendan.g.hay@gmail.com>
+-- Copyright   : (c) 2014-2015 Brendan Hay <brendan.g.hay@gmail.com>
 -- License     : This Source Code Form is subject to the terms of
 --               the Mozilla Public License, v. 2.0.
 --               A copy of the MPL can be found in the LICENSE file or
@@ -91,7 +91,7 @@ import           Data.Text.Manipulate.Internal.Types
 -- $unicode
 -- While this library supports Unicode in a similar fashion to the
 -- underlying <http://hackage.haskell.org/package/text text> library,
--- more Unicode specific handling of word boundaries can be found in the
+-- more explicit Unicode specific handling of word boundaries can be found in the
 -- <http://hackage.haskell.org/package/text-icu text-icu> library.
 
 -- $fusion
