@@ -18,7 +18,7 @@ import           Data.List      (intersperse)
 import           Data.Monoid
 import           Data.Text      (Text)
 import qualified Data.Text      as Text
-import           Data.Text.Case
+import           Data.Text.Manipulate
 
 main :: IO ()
 main = defaultMain
