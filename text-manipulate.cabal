@@ -1,5 +1,5 @@
 name:                  text-manipulate
-version:               0.1.3
+version:               0.1.3.1
 synopsis:              Case conversion, word boundary manipulation, and textual subjugation.
 homepage:              https://github.com/brendanhay/text-manipulate
 license:               OtherLicense
@@ -57,7 +57,7 @@ benchmark benchmarks
 
     build-depends:
           base
-        , criterion       >= 1.0.0.2 && < 1.1
+        , criterion       >= 1.0.0.2
         , text-manipulate
         , text
 
