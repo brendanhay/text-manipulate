@@ -55,7 +55,6 @@ module Data.Text.Lazy.Manipulate
     , toAcronym
 
     -- * Ordinals
-    , Ordinal (..)
     , toOrdinal
 
     -- * Casing
@@ -75,7 +74,6 @@ import qualified Data.Char                            as Char
 import           Data.Int
 import           Data.List                            (intersperse)
 import           Data.Monoid
-import           Data.Text.Buildable
 import           Data.Text.Lazy                       (Text)
 import qualified Data.Text.Lazy                       as LText
 import           Data.Text.Lazy.Builder               (toLazyText)
@@ -210,7 +208,6 @@ toAcronym (LText.filter Char.isUpper -> x)
     | otherwise          = Nothing
 
 -- | Render an ordinal used to denote the position in an ordered sequence.
--- @toOrdinal == build . Ordinal@.
 --
 -- >>> toOrdinal (101 :: Int)
 -- "101st"
@@ -218,7 +215,7 @@ toAcronym (LText.filter Char.isUpper -> x)
 -- >>> toOrdinal (12 :: Int)
 -- "12th"
 toOrdinal :: Integral a => a -> Text
-toOrdinal = toLazyText . build . Ordinal
+toOrdinal = toLazyText . ordinal
 
 -- | O(n) Convert casing to @Title Cased Phrase@. /Subject to fusion./
 toTitle :: Text -> Text

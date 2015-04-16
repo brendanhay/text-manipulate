@@ -55,7 +55,6 @@
     , toAcronym
 
     -- * Ordinals
-    , Ordinal (..)
     , toOrdinal
 
     -- * Casing
@@ -219,7 +218,6 @@ toAcronym (Text.filter Char.isUpper -> x)
     | otherwise         = Nothing
 
 -- | Render an ordinal used to denote the position in an ordered sequence.
--- @toOrdinal == build . Ordinal@.
 --
 -- >>> toOrdinal (101 :: Int)
 -- "101st"
