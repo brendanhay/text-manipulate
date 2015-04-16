@@ -44,7 +44,7 @@ library
         , Data.Text.Manipulate.Internal.Types
 
     build-depends:
-          base >= 4.5
+          base >= 4.5 && < 5
         , text >= 1.1
 
 benchmark benchmarks
