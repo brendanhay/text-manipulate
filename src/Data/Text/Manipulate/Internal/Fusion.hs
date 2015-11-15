@@ -1,6 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE RankNTypes   #-}
+{-# LANGUAGE ViewPatterns #-}
 
 -- Module      : Data.Text.Manipulate.Internal.Fusion
 -- Copyright   : (c) 2014-2015 Brendan Hay <brendan.g.hay@gmail.com>
@@ -17,7 +17,8 @@ module Data.Text.Manipulate.Internal.Fusion where
 import qualified Data.Char                             as Char
 import           Data.Text                             (Text)
 import qualified Data.Text.Internal.Fusion             as Fusion
-import           Data.Text.Internal.Fusion.CaseMapping (upperMapping, lowerMapping)
+import           Data.Text.Internal.Fusion.CaseMapping (lowerMapping,
+                                                        upperMapping)
 import           Data.Text.Internal.Fusion.Common
 import           Data.Text.Internal.Fusion.Types
 import qualified Data.Text.Internal.Lazy.Fusion        as LFusion
@@ -44,10 +45,6 @@ dropWord (tokenise -> Stream next0 s0 len) = Stream next (True :*: s0) len
                     U c        -> Yield c (skip  :*: s')
                     L c        -> Yield c (skip  :*: s')
 {-# INLINE [0] dropWord #-}
-
-toTitle :: Stream Char -> Stream Char
-toTitle = mapHead toUpper . transformWith (yield ' ') upper lower . tokenise
-{-# INLINE [0] toTitle #-}
 
 toCamel :: Stream Char -> Stream Char
 toCamel = mapHead toLower . transformWith skip' upper lower . tokenise

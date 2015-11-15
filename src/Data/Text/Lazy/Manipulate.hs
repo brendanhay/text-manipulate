@@ -219,7 +219,7 @@ toOrdinal = toLazyText . ordinal
 
 -- | O(n) Convert casing to @Title Cased Phrase@. /Subject to fusion./
 toTitle :: Text -> Text
-toTitle = lazy Fusion.toTitle
+toTitle = LText.toTitle
 
 -- | O(n) Convert casing to @camelCasedPhrase@. /Subject to fusion./
 toCamel :: Text -> Text

@@ -229,7 +229,7 @@ toOrdinal = LText.toStrict . LMan.toOrdinal
 
 -- | O(n) Convert casing to @Title Cased Phrase@. /Subject to fusion./
 toTitle :: Text -> Text
-toTitle = strict Fusion.toTitle
+toTitle = Text.toTitle
 
 -- | O(n) Convert casing to @camelCasedPhrase@. /Subject to fusion./
 toCamel :: Text -> Text
