@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ViewPatterns      #-}
+{-# LANGUAGE CPP               #-}
 
 -- Module      : Data.Text.Lazy.Manipulate
 -- Copyright   : (c) 2014-2015 Brendan Hay <brendan.g.hay@gmail.com>
@@ -73,7 +74,9 @@ module Data.Text.Lazy.Manipulate
 import qualified Data.Char                            as Char
 import           Data.Int
 import           Data.List                            (intersperse)
+#if __GLASGOW_HASKELL__ < 804
 import           Data.Monoid
+#endif
 import           Data.Text.Lazy                       (Text)
 import qualified Data.Text.Lazy                       as LText
 import           Data.Text.Lazy.Builder               (toLazyText)

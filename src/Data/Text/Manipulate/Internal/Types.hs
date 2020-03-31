@@ -1,6 +1,7 @@
 {-# LANGUAGE MagicHash         #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ViewPatterns      #-}
+{-# LANGUAGE CPP               #-}
 
 -- Module      : Data.Text.Manipulate.Internal.Types
 -- Copyright   : (c) 2014-2015 Brendan Hay <brendan.g.hay@gmail.com>
@@ -16,7 +17,9 @@ module Data.Text.Manipulate.Internal.Types where
 
 import           Control.Monad
 import qualified Data.Char              as Char
+#if __GLASGOW_HASKELL__ < 804
 import           Data.Monoid
+#endif
 import           Data.Text.Lazy.Builder (Builder, singleton)
 import           GHC.Base
 

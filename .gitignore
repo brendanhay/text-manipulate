@@ -6,6 +6,7 @@
 *.chs.h
 *.imports
 cabal.sandbox.config
+.stack-work
 
 # Dirs
 .cabal-sandbox
