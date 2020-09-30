@@ -2,7 +2,7 @@ name:                  text-manipulate
 version:               0.2.0.1
 synopsis:              Case conversion, word boundary manipulation, and textual subjugation.
 homepage:              https://github.com/brendanhay/text-manipulate
-license:               OtherLicense
+license:               MPL-2.0
 license-file:          LICENSE
 author:                Brendan Hay
 maintainer:            Brendan Hay <brendan.g.hay@gmail.com>
