@@ -10,7 +10,7 @@ copyright:             Copyright (c) 2014-2015 Brendan Hay
 category:              Data, Text
 build-type:            Simple
 extra-source-files:    README.md
-cabal-version:         >= 1.10
+cabal-version:         >= 1.20.0.0
 
 description:
     Manipulate identifiers and structurally non-complex pieces
