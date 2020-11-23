@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ViewPatterns      #-}
+{-# LANGUAGE ViewPatterns #-}
 
 -- Module      : Data.Text.Manipulate
--- Copyright   : (c) 2014-2015 Brendan Hay <brendan.g.hay@gmail.com>
+-- Copyright   : (c) 2014-2020 Brendan Hay <brendan.g.hay@gmail.com>
 -- License     : This Source Code Form is subject to the terms of
 --               the Mozilla Public License, v. 2.0.
 --               A copy of the MPL can be found in the LICENSE file or
@@ -18,9 +18,8 @@
 -- Assumptions have been made about word boundary characteristics inherint
 -- in predominantely English text, please see individual function documentation
 -- for further details and behaviour.
- module Data.Text.Manipulate
-    (
-    -- * Strict vs lazy types
+module Data.Text.Manipulate
+  ( -- * Strict vs lazy types
     -- $strict
 
     -- * Unicode
@@ -30,56 +29,58 @@
     -- $fusion
 
     -- * Subwords
+
     -- ** Removing words
-      takeWord
-    , dropWord
-    , stripWord
+    takeWord,
+    dropWord,
+    stripWord,
+
     -- ** Breaking on words
-    , breakWord
-    , splitWords
+    breakWord,
+    splitWords,
 
     -- * Character manipulation
-    , lowerHead
-    , upperHead
-    , mapHead
+    lowerHead,
+    upperHead,
+    mapHead,
 
     -- * Line manipulation
-    , indentLines
-    , prependLines
+    indentLines,
+    prependLines,
 
     -- * Ellipsis
-    , toEllipsis
-    , toEllipsisWith
+    toEllipsis,
+    toEllipsisWith,
 
     -- * Acronyms
-    , toAcronym
+    toAcronym,
 
     -- * Ordinals
-    , toOrdinal
+    toOrdinal,
 
     -- * Casing
-    , toTitle
-    , toCamel
-    , toPascal
-    , toSnake
-    , toSpinal
-    , toTrain
+    toTitle,
+    toCamel,
+    toPascal,
+    toSnake,
+    toSpinal,
+    toTrain,
 
     -- * Boundary predicates
-    , isBoundary
-    , isWordBoundary
-    ) where
+    isBoundary,
+    isWordBoundary,
+  )
+where
 
-import qualified Data.Char                            as Char
-import           Data.List                            (intersperse)
-import           Data.Monoid
-import           Data.Text                            (Text)
-import qualified Data.Text                            as Text
-import qualified Data.Text.Lazy                       as LText
-import qualified Data.Text.Lazy.Manipulate            as LMan
-import           Data.Text.Manipulate.Internal.Fusion (strict)
+import qualified Data.Char as Char
+import Data.List (intersperse)
+import Data.Text (Text)
+import qualified Data.Text as Text
+import qualified Data.Text.Lazy as LText
+import qualified Data.Text.Lazy.Manipulate as LMan
+import Data.Text.Manipulate.Internal.Fusion (strict)
 import qualified Data.Text.Manipulate.Internal.Fusion as Fusion
-import           Data.Text.Manipulate.Internal.Types
+import Data.Text.Manipulate.Internal.Types
 
 -- $strict
 -- This library provides functions for manipulating both strict and lazy Text types.
@@ -124,9 +125,9 @@ upperHead = mapHead Char.toUpper
 -- | Apply a function to the first character of a piece of text.
 mapHead :: (Char -> Char) -> Text -> Text
 mapHead f x =
-    case Text.uncons x of
-        Just (c, cs) -> Text.singleton (f c) <> cs
-        Nothing      -> x
+  case Text.uncons x of
+    Just (c, cs) -> Text.singleton (f c) <> cs
+    Nothing -> x
 
 -- | Indent newlines by the given number of spaces.
 --
@@ -147,13 +148,16 @@ toEllipsis n = toEllipsisWith n "..."
 
 -- | O(n) Truncate text to a specific length.
 -- If the text was truncated the given ellipsis sign will be appended.
-toEllipsisWith :: Int  -- ^ Length.
-               -> Text -- ^ Ellipsis.
-               -> Text
-               -> Text
+toEllipsisWith ::
+  -- | Length.
+  Int ->
+  -- | Ellipsis.
+  Text ->
+  Text ->
+  Text
 toEllipsisWith n suf x
-    | Text.length x > n = Text.take n x <> suf
-    | otherwise         = x
+  | Text.length x > n = Text.take n x <> suf
+  | otherwise = x
 
 -- | O(n) Returns the first word, or the original text if no word
 -- boundary is encountered. /Subject to fusion./
@@ -185,8 +189,8 @@ breakWord x = (takeWord x, dropWord x)
 -- Nothing
 stripWord :: Text -> Maybe Text
 stripWord x
-    | Text.length y < Text.length x = Just y
-    | otherwise                     = Nothing
+  | Text.length y < Text.length x = Just y
+  | otherwise = Nothing
   where
     y = dropWord x
 
@@ -198,9 +202,10 @@ splitWords :: Text -> [Text]
 splitWords = go
   where
     go x = case breakWord x of
-        (h, t) | Text.null h -> go t
-               | Text.null t -> [h]
-               | otherwise   -> h : go t
+      (h, t)
+        | Text.null h -> go t
+        | Text.null t -> [h]
+        | otherwise -> h : go t
 
 -- | O(n) Create an adhoc acronym from a piece of cased text.
 --
@@ -214,8 +219,8 @@ splitWords = go
 -- Nothing
 toAcronym :: Text -> Maybe Text
 toAcronym (Text.filter Char.isUpper -> x)
-    | Text.length x > 1 = Just x
-    | otherwise         = Nothing
+  | Text.length x > 1 = Just x
+  | otherwise = Nothing
 
 -- | Render an ordinal used to denote the position in an ordered sequence.
 --

@@ -31,7 +31,8 @@ let
   };
 
 in {
-  inherit (cabalProject.text-manipulate.components) library exes tests benchmarks;
+  inherit (cabalProject.text-manipulate.components)
+    library exes tests benchmarks;
   inherit (cabalProject.text-manipulate) checks;
 
   shell = cabalProject.shellFor {
