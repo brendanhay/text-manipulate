@@ -12,7 +12,7 @@ copyright:          Copyright (c) 2014-2020 Brendan Hay
 category:           Data, Text
 build-type:         Simple
 extra-source-files: README.md
-cabal-version:      >=2.0
+cabal-version:      2.0
 description:
   Manipulate identifiers and structurally non-complex pieces
   of text by delimiting word boundaries via a combination of whitespace,
