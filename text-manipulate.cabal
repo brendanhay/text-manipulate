@@ -52,7 +52,7 @@ library
 
   build-depends:   text >=1.1
 
-benchmark benchmarks
+benchmark bench 
   import:         base
   type:           exitcode-stdio-1.0
   main-is:        Main.hs
