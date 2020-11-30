@@ -7,9 +7,9 @@
 [![Cachix][cachix-badge]][cachix]
 
 [license]: https://opensource.org/licenses/MPL-2.0
-[license-badge]: https://img.shields.io/badge/License-MPL%202.0-blue.svg
+[license-badge]: https://img.shields.io/badge/license-MPL%202.0-blue.svg
 [build]: https://github.com/brendanhay/text-manipulate/actions
-[build-badge]: https://github.com/brendanhay/text-manipulate/workflows/Build/badge.svg
+[build-badge]: https://github.com/brendanhay/text-manipulate/workflows/build/badge.svg
 [hackage]: http://hackage.haskell.org/package/text-manipulate
 [hackage-badge]: https://img.shields.io/hackage/v/text-manipulate.svg
 [nix]: https://nixos.org
