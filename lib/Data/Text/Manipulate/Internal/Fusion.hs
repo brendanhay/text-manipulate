@@ -1,4 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE MagicHash #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ViewPatterns #-}
 
@@ -23,6 +25,12 @@ import Data.Text.Internal.Fusion.Types
 import qualified Data.Text.Internal.Lazy.Fusion as LFusion
 import qualified Data.Text.Lazy as LText
 import Data.Text.Manipulate.Internal.Types
+
+#if MIN_VERSION_text(2,0,0)
+import Data.Bits (shiftL, shiftR, (.&.))
+import GHC.Exts (Char(..), Int(..), chr#)
+import GHC.Int (Int64(..))
+#endif
 
 takeWord :: Stream Char -> Stream Char
 takeWord = transform (const Done) yield . tokenise
@@ -78,12 +86,41 @@ lazy f t = LFusion.unstream (f (LFusion.stream t))
 {-# INLINE [0] lazy #-}
 
 skip' :: forall s. s -> Step (CC s) Char
+#if MIN_VERSION_text(2,0,0)
+skip' s = Skip (CC s 0)
+#else
 skip' s = Skip (CC s '\0' '\0')
+#endif
 
 yield, upper, lower :: forall s. Char -> s -> Step (CC s) Char
+#if MIN_VERSION_text(2,0,0)
+
+yield !c s = Yield c (CC s 0)
+
+upper !c@(C# c#) s = case I64# (upperMapping c#) of
+  0 -> Yield c (CC s 0)
+  ab -> let (a, b) = chopOffChar ab in
+              Yield a (CC s b)
+
+lower !c@(C# c#) s = case I64# (lowerMapping c#) of
+  0 -> Yield c (CC s 0)
+  ab -> let (a, b) = chopOffChar ab in
+              Yield a (CC s b)
+
+chopOffChar :: Int64 -> (Char, Int64)
+chopOffChar ab = (chr a, ab `shiftR` 21)
+  where
+    chr (I# n) = C# (chr# n)
+    mask = (1 `shiftL` 21) - 1
+    a = fromIntegral $ ab .&. mask
+
+#else
+
 yield !c s = Yield c (CC s '\0' '\0')
 upper !c s = upperMapping c s
 lower !c s = lowerMapping c s
+
+#endif
 
 -- | Step across word boundaries using a custom action, and transform
 -- both subsequent uppercase and lowercase characters uniformly.
@@ -115,12 +152,24 @@ transformWith ::
   Stream Char
 transformWith md mu mc (Stream next0 s0 len) =
   -- HINT: len incorrect when the boundary replacement yields a char.
+#if MIN_VERSION_text(2,0,0)
+  Stream next (CC (False :*: False :*: s0) 0) len
+#else
   Stream next (CC (False :*: False :*: s0) '\0' '\0') len
+#endif
   where
+#if MIN_VERSION_text(2,0,0)
+    next (CC (up :*: prev :*: s) 0) =
+#else
     next (CC (up :*: prev :*: s) '\0' _) =
+#endif
       case next0 s of
         Done -> Done
+#if MIN_VERSION_text(2,0,0)
+        Skip s' -> Skip (CC (up :*: prev :*: s') 0)
+#else
         Skip s' -> Skip (CC (up :*: prev :*: s') '\0' '\0')
+#endif
         Yield t s' ->
           case t of
             B _ -> md (False :*: True :*: s')
@@ -129,7 +178,11 @@ transformWith md mu mc (Stream next0 s0 len) =
             U c | up -> mu c (True :*: False :*: s')
             U c -> mc c (True :*: False :*: s')
             L c -> mc c (False :*: False :*: s')
+#if MIN_VERSION_text(2,0,0)
+    next (CC s ab) = let (a, b) = chopOffChar ab in Yield a (CC s b)
+#else
     next (CC s a b) = Yield a (CC s b '\0')
+#endif
 {-# INLINE [0] transformWith #-}
 
 -- | A token representing characters and boundaries in a stream.
@@ -161,12 +214,24 @@ tokeniseWith ::
   Stream Token
 tokeniseWith f (Stream next0 s0 len) =
   -- HINT: len incorrect if there are adjacent boundaries, which are skipped.
+#if MIN_VERSION_text(2,0,0)
+  Stream next (CC (True :*: False :*: False :*: s0) 0) len
+#else
   Stream next (CC (True :*: False :*: False :*: s0) '\0' '\0') len
+#endif
   where
+#if MIN_VERSION_text(2,0,0)
+    next (CC (start :*: up :*: prev :*: s) 0) =
+#else
     next (CC (start :*: up :*: prev :*: s) '\0' _) =
+#endif
       case next0 s of
         Done -> Done
+#if MIN_VERSION_text(2,0,0)
+        Skip s' -> Skip (CC (start :*: up :*: prev :*: s') 0)
+#else
         Skip s' -> Skip (CC (start :*: up :*: prev :*: s') '\0' '\0')
+#endif
         Yield c s'
           | not b, start -> push
           | up -> push
@@ -176,16 +241,28 @@ tokeniseWith f (Stream next0 s0 len) =
             push
               | b = Yield (B c) (step False)
               | u, skip = Yield (U c) (step False)
+#if MIN_VERSION_text(2,0,0)
+              | u = Yield (B '\0') (CC (False :*: u :*: b :*: s') (fromIntegral (Char.ord c)))
+#else
               | u = Yield (B '\0') (CC (False :*: u :*: b :*: s') c '\0')
+#endif
               | otherwise = Yield (L c) (step False)
 
+#if MIN_VERSION_text(2,0,0)
+            step p = CC (p :*: u :*: b :*: s') 0
+#else
             step p = CC (p :*: u :*: b :*: s') '\0' '\0'
+#endif
 
             skip = up || start || prev
 
             b = f c
             u = Char.isUpper c
+#if MIN_VERSION_text(2,0,0)
+    next (CC s ab) = let (a, b) = chopOffChar ab in Yield (U a) (CC s b)
+#else
     next (CC s a b) = Yield (U a) (CC s b '\0')
+#endif
 {-# INLINE [0] tokeniseWith #-}
 
 mapHead :: (Stream Char -> Stream Char) -> Stream Char -> Stream Char
