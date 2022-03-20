@@ -1,7 +1,9 @@
 cabal-version:      2.2
 name:               text-manipulate
 version:            0.3.1.0
-synopsis:           Case conversion, word boundary manipulation, and textual subjugation.
+synopsis:
+  Case conversion, word boundary manipulation, and textual subjugation.
+
 homepage:           https://github.com/brendanhay/text-manipulate
 license:            MPL-2.0
 license-file:       LICENSE
